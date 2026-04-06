@@ -1,0 +1,5 @@
+Questions,Prompts,Responses (list of JSON objects),Models
+Which agency administers {program} in {state}?,,,
+"In {state}, how much time do agencies have to respond to public records requests?",,,
+What is the mailing address for the agency that administers {program} in {state}?,,,
+Who is the public records officer for the agency that administers {program} in {state}?,,,

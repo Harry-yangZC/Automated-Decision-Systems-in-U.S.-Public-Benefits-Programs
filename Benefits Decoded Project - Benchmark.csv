@@ -1,0 +1,16 @@
+Questions,Programs,MA,RI,CA,NY,TX
+Which agency administers {program} in {state}?,SNAP,The Massachusetts Department of Transitional Assistance (DTA),The Rhode Island Department of Human Services (DHS),The California Department of Social Services (CDSS),The New York State Office of Temporary and Disability Assistance (OTDA),The Texas Health and Human Services Commission (HHSC)
+"In {state}, how much time do agencies have to respond to public records requests on {program}?",Medicaid,10 business days with 20-30 business days extension,10 business days with 20 business days extension,10 calendar days  with 14 calendar days extension,5 business days with 15 business days extension,10 business days
+What is the state-level administration address for {program} in {state}?,SNAP,"DTA Document Processing Center
+P.O. Box 4406
+Taunton, MA 02780-0420","RI Department of Human Services
+P.O. Box 8709
+Cranston, RI 02920-8787","California Department of Social Services
+744 P Street
+Sacramento, CA 95814","New York State Office of Temporary and Disability Assistance
+40 North Pearl Street
+Albany, NY 12243","Texas Health and Human Services Commission
+P.O. Box 149027
+Austin, TX 78714-9027"
+what is the public records requests email address for the agency that administers {program} in {state}?,WIC,DPH.RAO@state.ma.us,pamela.lopes@health.ri.gov,WIC@cdph.ca.gov,foil@health.ny.gov,OpenRecordsRequest@hhs.texas.gov
+What phone number should the public use to contact the state-level agency that administers {program} in {state}?,LIHEAP,(800) 632-8175,1-855-697-4347,1-866-675-6623,1-800-342-3009,1-877-399-8939
