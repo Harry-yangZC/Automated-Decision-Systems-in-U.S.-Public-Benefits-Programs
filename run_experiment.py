@@ -240,13 +240,13 @@ def main():
     )
     parser.add_argument(
         "--benchmark",
-        default="Benefits Decoded Project - Benchmark.csv",
-        help="Path to the benchmark CSV (default: Benefits Decoded Project - Benchmark.csv)",
+        default="data/benchmark.csv",
+        help="Path to the benchmark CSV (default: data/benchmark.csv)",
     )
     parser.add_argument(
         "--output",
-        default="LLM_experiments.csv",
-        help="Path to the output experiment CSV (default: LLM_experiments.csv)",
+        default="results/LLM_experiments.csv",
+        help="Path to the output experiment CSV (default: results/LLM_experiments.csv)",
     )
     parser.add_argument(
         "--delay",

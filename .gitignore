@@ -5,7 +5,7 @@
 .env
 
 # Project proposal (private document)
-Benefits_Decoded_Project_Proposal.pdf
+docs/Benefits_Decoded_Project_Proposal.pdf
 
 # Python
 __pycache__/

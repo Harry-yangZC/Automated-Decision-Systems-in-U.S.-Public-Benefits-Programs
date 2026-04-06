@@ -39,7 +39,9 @@ The project is in the **early experimental phase of Stage 1**, focused on LLM-as
 - **Benchmark test set** with 5 question templates, 4 programs, and 5 pilot states (MA, RI, CA, NY, TX), each with hand-verified ground-truth answers.
 - **Experiment runner** (`run_experiment.py`) that queries models via OpenRouter, collects structured JSON responses (answer, source, confidence), supports multiple runs per combination, and resumes from partial results.
 - **Summary pipeline** (`summarize_experiments.py`) that aggregates across runs to compute majority answers, agreement rates, and average confidence per (question, program, state, model).
-- **Initial experiment results** (~975 raw rows, 77 summary rows) from three free-tier models: Qwen 3.6 Plus, OpenAI GPT-OSS-120B, and Meta Llama 3.3 70B Instruct.
+- **Accuracy scoring** (`score_experiments.py`) that joins summary rows to [`data/benchmark.csv`](data/benchmark.csv) and scores each majority answer with question-type-aware matchers (agency abbreviation; primary response-time deadline with an extension-clause guard; address via zip, then PO Box, then street number; case-insensitive exact email; phone patterns normalized to 10 digits). Writes [`results/LLM_experiments_scored.csv`](results/LLM_experiments_scored.csv) and prints aggregate statistics.
+- **Repository layout** — inputs under `data/`, experiment outputs under `results/`, and project docs under `docs/`. The proposal PDF is expected at `docs/Benefits_Decoded_Project_Proposal.pdf` locally but is **not** committed (see [.gitignore](.gitignore)); clones receive code, benchmark, and results CSVs without that file.
+- **Initial experiment results** (1,029 raw rows, 75 summary rows, 105 scored rows) from three free-tier models: Qwen 3.6 Plus, OpenAI GPT-OSS-120B, and Meta Llama 3.3 70B Instruct.
 
 ### Preliminary observations
 
@@ -47,10 +49,10 @@ The project is in the **early experimental phase of Stage 1**, focused on LLM-as
 - GPT-OSS-120B produced partial coverage (complete for some questions, missing for others).
 - Meta Llama 3.3 70B failed systematically (no answers extracted).
 - Cross-run agreement rates are low (0.2–0.6), largely due to verbosity variation rather than factual disagreement — models identify the same entities but phrase answers differently each time.
+- **Scoring snapshot (current pilot run):** On rows with a non-empty majority answer, agency names and mailing-address fields align with the benchmark most often; public-records response-time answers are mixed (e.g., some models cite extension windows instead of the primary deadline); WIC public-records emails and LIHEAP phone numbers often disagree with the hand-verified contacts, reflecting both model grounding limits and strict exact-match scoring for those fields.
 
 ### What remains
 
-- Accuracy scoring of LLM outputs against the benchmark ground-truth.
 - Experiments with frontier thinking models (latest OpenAI GPT, Google Gemini, Anthropic Claude) as specified in the proposal's cross-LLM validation protocol.
 - Scaling from 5 pilot states to all 50.
 - Stages 2–4 of the pipeline.
@@ -60,13 +62,19 @@ The project is in the **early experimental phase of Stage 1**, focused on LLM-as
 ```
 ├── README.md
 ├── requirements.txt
-├── .env                                          # OPENROUTER_API_KEY (not committed)
-├── run_experiment.py                             # LLM experiment runner (OpenRouter)
-├── summarize_experiments.py                      # Aggregates raw runs into summary rows
-├── Benefits Decoded Project - Benchmark.csv      # Hand-verified ground-truth answers
-├── Benefits Decoded Project - LLM Experiment.csv # Question template reference (Google Sheets)
-├── LLM_experiments.csv                           # Raw experiment results
-└── LLM_experiments_summary.csv                   # Aggregated summary results
+├── .env                              # OPENROUTER_API_KEY (not committed)
+├── run_experiment.py                 # LLM experiment runner (OpenRouter)
+├── summarize_experiments.py          # Aggregates raw runs into summary rows
+├── score_experiments.py              # Scores summary answers against benchmark
+├── data/
+│   ├── benchmark.csv                 # Hand-verified ground-truth answers
+│   └── questions_reference.csv       # Question template reference (Google Sheets)
+├── results/
+│   ├── LLM_experiments.csv           # Raw experiment results
+│   ├── LLM_experiments_summary.csv   # Aggregated summary results
+│   └── LLM_experiments_scored.csv    # Accuracy scores vs benchmark
+└── docs/
+    └── Benefits_Decoded_Project_Proposal.pdf   # local only; gitignored
 ```
 
 ## Setup
@@ -94,8 +102,8 @@ Key options:
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--models` | 3 free-tier models | Comma-separated OpenRouter model IDs |
-| `--benchmark` | `Benefits Decoded Project - Benchmark.csv` | Path to benchmark CSV |
-| `--output` | `LLM_experiments.csv` | Output path for raw results |
+| `--benchmark` | `data/benchmark.csv` | Path to benchmark CSV |
+| `--output` | `results/LLM_experiments.csv` | Output path for raw results |
 | `--runs` | `5` | Number of runs per (question, state, model) |
 | `--delay` | `3.0` | Seconds between API calls |
 
@@ -109,10 +117,24 @@ python summarize_experiments.py
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--input` | `LLM_experiments.csv` | Path to raw experiment CSV |
-| `--output` | `LLM_experiments_summary.csv` | Output path for summary |
+| `--input` | `results/LLM_experiments.csv` | Path to raw experiment CSV |
+| `--output` | `results/LLM_experiments_summary.csv` | Output path for summary |
 
 Produces one row per (question, program, state, model) with majority answer, agreement rate, unique sources, and average confidence score.
+
+### Score against benchmark
+
+```bash
+python score_experiments.py
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--summary` | `results/LLM_experiments_summary.csv` | Path to summary CSV |
+| `--benchmark` | `data/benchmark.csv` | Path to benchmark CSV |
+| `--output` | `results/LLM_experiments_scored.csv` | Output path for scored CSV |
+
+Compares each model's majority answer to the hand-verified ground truth using question-type-aware matching (agency abbreviation check, response-time deadline extraction, address zip/PO-box matching, exact email match, normalized phone-digit comparison). Outputs a scored CSV and prints aggregate accuracy statistics.
 
 ## Team
 

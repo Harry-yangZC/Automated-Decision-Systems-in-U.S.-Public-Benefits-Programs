@@ -74,13 +74,13 @@ def main():
     )
     parser.add_argument(
         "--input",
-        default="LLM_experiments.csv",
-        help="Path to the raw experiment CSV (default: LLM_experiments.csv)",
+        default="results/LLM_experiments.csv",
+        help="Path to the raw experiment CSV (default: results/LLM_experiments.csv)",
     )
     parser.add_argument(
         "--output",
-        default="LLM_experiments_summary.csv",
-        help="Path for the summary CSV (default: LLM_experiments_summary.csv)",
+        default="results/LLM_experiments_summary.csv",
+        help="Path for the summary CSV (default: results/LLM_experiments_summary.csv)",
     )
     args = parser.parse_args()
 
