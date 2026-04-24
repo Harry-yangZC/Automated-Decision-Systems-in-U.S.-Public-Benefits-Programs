@@ -1,0 +1,4 @@
+model,model_short,mean,median,std,n
+anthropic/claude-opus-4.7,Claude Opus 4.7,0.49,0.4,0.3304037933599835,25
+google/gemma-4-26b-a4b-it,Gemma 4 26B,0.234,0.2,0.09433981132056604,25
+openai/gpt-oss-120b:free,GPT-OSS 120B,0.234,0.2,0.07461009761866463,25

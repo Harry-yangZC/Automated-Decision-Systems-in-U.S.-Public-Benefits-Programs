@@ -1,0 +1,7 @@
+model,is_correct,n_cells,mean_gov_ratio,ci_low,ci_high
+anthropic/claude-opus-4.7,True,19,0.9157894736842105,0.7984733497049309,1.0
+anthropic/claude-opus-4.7,False,6,1.0,1.0,1.0
+google/gemma-4-26b-a4b-it,True,11,0.6909090909090909,0.4354184820020913,0.9463996998160905
+google/gemma-4-26b-a4b-it,False,14,0.9857142857142858,0.9577142857142857,1.0
+openai/gpt-oss-120b:free,True,9,0.9777777777777779,0.9342222222222223,1.0
+openai/gpt-oss-120b:free,False,16,0.975,0.9415266274978653,1.0

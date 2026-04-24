@@ -1,0 +1,4 @@
+model,agency,response_time,address,email,phone
+anthropic/claude-opus-4.7,1.0,1.0,0.6,0.2,1.0
+google/gemma-4-26b-a4b-it,1.0,0.8,0.2,0.2,0.0
+openai/gpt-oss-120b:free,1.0,0.6,0.2,0.0,0.0

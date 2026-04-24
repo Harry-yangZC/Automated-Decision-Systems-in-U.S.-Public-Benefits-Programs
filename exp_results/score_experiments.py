@@ -42,13 +42,18 @@ def classify_question(template: str) -> str:
 # ---------------------------------------------------------------------------
 
 def match_agency(ground_truth: str, answer: str) -> bool:
-    """Check if the agency abbreviation from the ground truth appears in the answer."""
+    """Check if the agency abbreviation or full name from the ground truth appears in the answer."""
+    answer_lower = answer.lower()
     abbrev_match = re.search(r"\(([A-Z]{2,})\)", ground_truth)
     if abbrev_match:
         abbrev = abbrev_match.group(1)
-        return abbrev.lower() in answer.lower()
+        if abbrev.lower() in answer_lower:
+            return True
+        full_name = re.sub(r"\s*\([A-Z]{2,}\)", "", ground_truth).strip()
+        full_name = re.sub(r"^The\s+", "", full_name).strip()
+        return full_name.lower() in answer_lower
     clean_gt = re.sub(r"^The\s+", "", ground_truth).strip()
-    return clean_gt.lower() in answer.lower()
+    return clean_gt.lower() in answer_lower
 
 
 def match_response_time(ground_truth: str, answer: str) -> bool:
@@ -244,8 +249,8 @@ def main():
     )
     parser.add_argument(
         "--summary",
-        default="results/LLM_experiments_summary.csv",
-        help="Path to the summary CSV (default: results/LLM_experiments_summary.csv)",
+        default="exp_results/LLM_experiments_summary.csv",
+        help="Path to the summary CSV (default: exp_results/LLM_experiments_summary.csv)",
     )
     parser.add_argument(
         "--benchmark",
@@ -254,8 +259,8 @@ def main():
     )
     parser.add_argument(
         "--output",
-        default="results/LLM_experiments_scored.csv",
-        help="Path for the scored CSV (default: results/LLM_experiments_scored.csv)",
+        default="exp_results/LLM_experiments_scored.csv",
+        help="Path for the scored CSV (default: exp_results/LLM_experiments_scored.csv)",
     )
     args = parser.parse_args()
 

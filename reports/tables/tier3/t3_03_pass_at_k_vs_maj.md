@@ -1,0 +1,20 @@
+| model                     | question_type   |   n_cells |   pass@1 |   maj@5 |   pass@5 |
+|:--------------------------|:----------------|----------:|---------:|--------:|---------:|
+| anthropic/claude-opus-4.7 | agency          |         5 |    1.000 |   1.000 |    1.000 |
+| anthropic/claude-opus-4.7 | response_time   |         5 |    0.960 |   1.000 |    1.000 |
+| anthropic/claude-opus-4.7 | address         |         5 |    0.600 |   0.600 |    0.600 |
+| anthropic/claude-opus-4.7 | email           |         5 |    0.200 |   0.200 |    0.200 |
+| anthropic/claude-opus-4.7 | phone           |         5 |    0.920 |   1.000 |    1.000 |
+| anthropic/claude-opus-4.7 | ALL             |        25 |    0.736 |   0.760 |    0.760 |
+| google/gemma-4-26b-a4b-it | agency          |         5 |    1.000 |   1.000 |    1.000 |
+| google/gemma-4-26b-a4b-it | response_time   |         5 |    0.760 |   0.800 |    0.800 |
+| google/gemma-4-26b-a4b-it | address         |         5 |    0.240 |   0.200 |    0.400 |
+| google/gemma-4-26b-a4b-it | email           |         5 |    0.120 |   0.200 |    0.200 |
+| google/gemma-4-26b-a4b-it | phone           |         5 |    0.000 |   0.000 |    0.000 |
+| google/gemma-4-26b-a4b-it | ALL             |        25 |    0.424 |   0.440 |    0.480 |
+| openai/gpt-oss-120b:free  | agency          |         5 |    1.000 |   1.000 |    1.000 |
+| openai/gpt-oss-120b:free  | response_time   |         5 |    0.600 |   0.600 |    0.800 |
+| openai/gpt-oss-120b:free  | address         |         5 |    0.200 |   0.200 |    0.400 |
+| openai/gpt-oss-120b:free  | email           |         5 |    0.040 |   0.000 |    0.200 |
+| openai/gpt-oss-120b:free  | phone           |         5 |    0.000 |   0.000 |    0.000 |
+| openai/gpt-oss-120b:free  | ALL             |        25 |    0.368 |   0.360 |    0.480 |

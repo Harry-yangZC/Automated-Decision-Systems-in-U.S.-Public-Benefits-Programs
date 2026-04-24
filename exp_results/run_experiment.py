@@ -20,9 +20,9 @@ STATE_FULL_NAMES = {
 }
 
 DEFAULT_MODELS = [
-    "qwen/qwen3.6-plus:free",
+    "google/gemma-4-26b-a4b-it",
     "openai/gpt-oss-120b:free",
-    "meta-llama/llama-3.3-70b-instruct:free",
+    "anthropic/claude-opus-4.7",
 ]
 
 SYSTEM_PROMPT = (
@@ -236,7 +236,7 @@ def main():
     parser.add_argument(
         "--models",
         default=",".join(DEFAULT_MODELS),
-        help="Comma-separated OpenRouter model IDs (default: the 3 free models)",
+        help="Comma-separated OpenRouter model IDs (default: 2 free models + claude-opus-4.7 (paid))",
     )
     parser.add_argument(
         "--benchmark",
@@ -245,8 +245,8 @@ def main():
     )
     parser.add_argument(
         "--output",
-        default="results/LLM_experiments.csv",
-        help="Path to the output experiment CSV (default: results/LLM_experiments.csv)",
+        default="exp_results/LLM_experiments.csv",
+        help="Path to the output experiment CSV (default: exp_results/LLM_experiments.csv)",
     )
     parser.add_argument(
         "--delay",
