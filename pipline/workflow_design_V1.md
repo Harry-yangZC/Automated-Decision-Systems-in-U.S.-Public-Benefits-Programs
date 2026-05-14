@@ -1,3 +1,11 @@
+# Workflow Design V1 (superseded)
+
+> **Status:** superseded by [`workflow_design_V2.md`](workflow_design_V2.md). V1 is preserved as design history -- it introduces the composable-template concept that V2 keeps intact, but V2 supersedes V1 on pilot scope (MA x SNAP vertical pilot instead of breadth-first), schema decomposition (three artifacts instead of one), Phase 3 prompt design (typed short-answer extraction instead of free-form), certification criteria (tiered instead of "100% agreement"), and validation layering (programmatic -> LLM-as-judge -> human instead of MuckRock judge + human only).
+>
+> Read V2 for the current plan; consult V1 only for the original framing of the core idea.
+
+---
+
 ### The core idea: a composable template system.
 
 Think of each request as assembled from a set of JSON-defined components, with an LLM performing the final composition into natural prose. Define the modular templates as structured data (JSON templates), then use an LLM to compose them into coherent, state-compliant prose.

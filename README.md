@@ -32,7 +32,7 @@ Assemble a versioned national dataset with provenance, uncertainty flags, and re
 
 ## Current Progress
 
-The project is in the **early experimental phase of Stage 1**, focused on LLM-assisted extraction benchmarking over a 5-state pilot.
+Stage 1 is in progress. We have completed an initial 5-state LLM-extraction benchmark, built a four-tier analysis pipeline over those results, and used the findings to design a next-stage workflow ([`pipline/workflow_design_V2.md`](pipline/workflow_design_V2.md)) that narrows Stage 1 to an end-to-end **Massachusetts x SNAP** vertical pilot before scaling.
 
 ### What has been completed
 
@@ -42,6 +42,8 @@ The project is in the **early experimental phase of Stage 1**, focused on LLM-as
 - **Accuracy scoring** (`score_experiments.py`) that joins summary rows to [`data/benchmark.csv`](data/benchmark.csv) and scores each majority answer with question-type-aware matchers (agency abbreviation; primary response-time deadline with an extension-clause guard; address via zip, then PO Box, then street number; case-insensitive exact email; phone patterns normalized to 10 digits). Writes [`exp_results/LLM_experiments_scored.csv`](exp_results/LLM_experiments_scored.csv) and prints aggregate statistics.
 - **Repository layout** — inputs under `data/`, experiment outputs under `exp_results/`, and project docs under `docs/`. The proposal PDF is expected at `docs/Benefits_Decoded_Project_Proposal.pdf` locally but is **not** committed (see [.gitignore](.gitignore)); clones receive code, benchmark, and results CSVs without that file.
 - **Initial experiment results** (375 raw rows, 75 summary rows, 75 scored rows) from three models: Google Gemma 4 26B A4B IT (paid), OpenAI GPT-OSS-120B (free), and Anthropic Claude Opus 4.7 (paid).
+- **Four-tier analysis pipeline** ([`exp_analysis/`](exp_analysis/)) over the 375 raw runs: headline accuracy, calibration and self-consistency, error taxonomy and consolidation gap, and source grounding. Regenerates plots, tables (CSV + Markdown), and per-tier summaries under [`reports/`](reports/), stitched together by [`reports/README.md`](reports/README.md).
+- **Workflow design docs** for the next stage of Stage 1: [`pipline/workflow_design_V1.md`](pipline/workflow_design_V1.md) introduces the composable-template idea (an LLM composing prose from validated structured slots, not inventing facts); [`pipline/workflow_design_V2.md`](pipline/workflow_design_V2.md) supersedes V1 with a vertical-pilot architecture for **MA x SNAP** -- gold-letter spec-by-example, three-artifact playbook decomposition (`state_law` / `agency_program` / `request_modules`), typed short-answer extraction, tiered certification, programmatic-then-semantic validation, and explicit promotion gates from MA x SNAP to multi-program and multi-state.
 
 ### Preliminary observations
 
@@ -51,12 +53,28 @@ The project is in the **early experimental phase of Stage 1**, focused on LLM-as
 - **Phone numbers are an Opus-only success:** Opus answers 5/5 correctly, while Gemma and GPT-OSS each answer 0/5 — the free/cheap models tend to surface general public-assistance hotlines or hallucinate plausible-looking digits instead of the LIHEAP-specific number in the benchmark.
 - **Cross-run agreement:** Opus's mean agreement rate (0.49) is roughly double Gemma's and GPT-OSS's (0.23 each), suggesting Opus produces materially more consistent phrasings of the same answer across the 5 runs.
 - **Scoring snapshot (current pilot run):** Agency names match essentially universally; public-records response-time answers are mostly correct with occasional confusion between the primary deadline and the extension clause; mailing addresses, WIC public-records emails, and LIHEAP phone numbers remain the hardest fields, reflecting both model grounding limits and strict exact-match scoring for those fields.
+- **Self-reported confidence is poorly calibrated:** `confidence=high` covers 330 of the 375 runs but only **54%** of those runs are correct (95% CI 48-59%). Confidence cannot be used as a standalone trust signal -- this is one of the motivations for V2's tiered certification gate. See Tier 2 (`reports/plots/tier2/t2_02_confidence_calibration.png`).
+- **Cross-model error overlap:** **6 of 25** cells are wrong across all three models and **9 of 25** are correct across all three; the remaining 10 cells reveal model-specific knowledge gaps that cross-model agreement is well-suited to catch. See Tier 3 (`reports/plots/tier3/t3_01_models_wrong_histogram.png`).
+- **pass@5 vs maj@5 oracle gap is small** (Opus +0%, Gemma +4%, GPT-OSS +12%): majority voting over 5 runs recovers most of what an oracle best-of-5 could, so adding more runs has diminishing returns relative to switching models or improving prompts. See Tier 3 (`reports/plots/tier3/t3_03_pass_at_k_vs_maj.png`).
+- **Source grounding is necessary but not sufficient:** `.gov` citation rates are similar across correct and incorrect cells (e.g. Gemma cites `.gov` on 99% of *incorrect* cells), and state-domain pattern matches are near-universal regardless of correctness. A URL filter alone won't gate quality -- V2 layers in verbatim-quote retrieval grounding on top of source-domain checks. See Tier 4 (`reports/plots/tier4/t4_02_gov_ratio_vs_correctness.png`).
+- **Scorer-strictness audit:** 9 of 36 incorrect cells still contain a ground-truth fragment (zip code, email domain, agency abbreviation, deadline number), suggesting some "incorrect" verdicts are matcher artifacts rather than model errors. V2's typed short-answer extraction is designed to collapse this ambiguity by constraining outputs at generation time rather than parsing free prose at scoring time.
 
-### What remains
+### Next steps (per [`pipline/workflow_design_V2.md`](pipline/workflow_design_V2.md))
 
-- Experiments with additional frontier thinking models (latest OpenAI GPT and Google Gemini) as specified in the proposal's cross-LLM validation protocol.
-- Scaling from 5 pilot states to all 50.
-- Stages 2–4 of the pipeline.
+The immediate plan is the **MA x SNAP vertical pilot** (V2 Phases 1-5), running the full Stage 1 -> Stage 2 path on a single (state, program) cell before adding a second state or program:
+
+1. **Phase 1 - Research & schema.** Hand-write the MA SNAP gold letter and annotate every word as `slot | module | boilerplate`. Decompose the playbook into three artifacts (`state_law`, `agency_program`, `request_modules`) and manually populate the MA and MA x SNAP rows with per-field evidence URLs, verbatim quotes, and `retrieved_at` timestamps.
+2. **Phase 2 - Question set.** Auto-derive `question_spec.yaml` from the schema (one question per populated field) and hand-verify the MA SNAP benchmark, sourcing ground-truth values directly from the populated playbook to eliminate "benchmark vs. playbook" drift.
+3. **Phase 3 - Typed short-answer extraction.** Replace today's free-form research prompt with a per-format prompt that constrains the LLM to a single typed value (e.g. 10-digit phone, statute citation <= 60 chars), uses web-tool-enabled models for retrieval grounding, and runs the tiered certification gate (auto-certify / soft-certify / manual queue) combining cross-model agreement, self-consistency, and source-domain matching.
+4. **Phase 4 - Drafting.** Join the populated playbook with selected request modules and few-shot MuckRock precedents; have the drafting LLM compose the letter plus a structured `<validation>` block listing every slot location.
+5. **Phase 5 - Validation.** Run Layer 1a (programmatic checklist) first, then Layer 1b (LLM-as-judge against MuckRock precedents) only on drafts that pass 1a, then Layer 2 (human review against the gold letter, with character-edit-distance acceptance criteria).
+6. **Phase 6 - Promotion gates.** Promote from MA x SNAP to MA x {6 programs} to 5 states x 2 programs to nationwide scale on quantitative criteria (auto-certification rate, draft acceptance rate, real-submission response rate). Each gate adds exactly one axis of variation so failures are diagnosable.
+
+### Longer-term (proposal aims)
+
+- Experiments with additional frontier thinking models (latest OpenAI GPT and Google Gemini) once V2's typed-extraction prompt is in place.
+- Scaling from 5 pilot states to all 50, and from SNAP to the full six-program set (SNAP, Medicaid, TANF, WIC, LIHEAP, CHIP).
+- Stages 2-4 of the pipeline: nationwide drafting campaign, agency-response document ingestion and extraction, and versioned national dataset construction.
 
 ## Repository Structure
 
@@ -86,6 +104,13 @@ The project is in the **early experimental phase of Stage 1**, focused on LLM-as
 │   ├── tables/tier{1..4}/            # CSV + Markdown tables per tier
 │   ├── data/                         # Derived intermediates (e.g. raw_graded.csv)
 │   └── README.md                     # Stitched narrative + thumbnail index
+├── pipline/                          # Next-stage workflow design (typo to be renamed -> pipeline/)
+│   ├── workflow_design_V1.md         # Initial composable-template concept (superseded)
+│   ├── workflow_design_V2.md         # Current design: MA x SNAP vertical pilot
+│   ├── drafting_prompt.text          # Drafting prompt skeleton (V1)
+│   ├── questions_prompt.txt          # Research prompt skeleton (V1, empty placeholder)
+│   ├── request_playbook.json         # V1 schema placeholder (empty; V2 splits into 3 schemas)
+│   └── request_playbook.csv          # V1 schema placeholder (empty; V2 splits into 3 schemas)
 └── docs/
     ├── scoring_strategies.md
     └── Benefits_Decoded_Project_Proposal.pdf   # local only; gitignored
