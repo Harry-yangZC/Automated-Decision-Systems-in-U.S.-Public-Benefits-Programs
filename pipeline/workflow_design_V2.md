@@ -10,13 +10,14 @@
 
 ## 0. TL;DR
 
-We are building a reproducible LLM-assisted pipeline that turns official state government webpages into validated, structured "Request Playbook" data, and turns that data into state-compliant public records request letters. V2 is a redesign of [V1](workflow_design_V1.md) with five principal changes:
+We are building a reproducible LLM-assisted pipeline that turns official state government webpages and successful public-records productions into validated, structured "Request Playbook" data, and turns that data into state-compliant public records request letters. V2 is a redesign of [V1](workflow_design_V1.md) with six principal changes:
 
 1. **Vertical-slice pilot.** We instrument the entire pipeline on one cell — Massachusetts × SNAP — before we add a second state or a second program. Breadth comes only after the architecture is proven on depth.
 2. **Three-artifact decomposition.** The single playbook schema in V1 is split into `state_law` (50 rows long-term), `agency_program` (~300 rows long-term), and `request_modules` (jurisdiction-independent content blocks). Cardinality, update cadence, and authorship differ across the three; mixing them creates duplication and drift risk.
-3. **Spec-by-example before schema lock.** We hand-write a complete, submittable MA SNAP request letter *first*, then design the schema by decomposing that letter. This catches schema gaps for the cost of one afternoon of human research, instead of one weekend of LLM tokens.
-4. **Short-answer typed extraction in Phase 3.** The current free-form "research and answer" prompt is replaced by a per-question-type prompt that constrains the LLM to a single typed value with explicit length and format limits (e.g., phone is exactly 10 digits, statute citation is one line ≤ 60 chars). This makes scoring near-deterministic and dramatically reduces matcher complexity in [`exp_results/score_experiments.py`](../exp_results/score_experiments.py).
-5. **Two-layer programmatic-then-semantic validation.** Phase 5 runs a deterministic checklist (Layer 1a) before any LLM-as-judge cost is paid (Layer 1b), and only escalates to human review (Layer 2) for drafts that survive both.
+3. **Gold request + successful production before schema lock.** We recover or reconstruct a complete, submittable MA SNAP request letter *first*, and we mine the PI-provided successful DTA production package (`gold_letter.pdf`) before locking schemas or modules. This catches schema gaps and teaches the pipeline what actually produced useful records.
+4. **Production-grounded request modules.** The request body is seeded from DTA's successful request language and the responsive Thomson Reuters / West Publishing CLEAR / ID Risk Analytics records, not only from generic FOIA examples.
+5. **Short-answer typed extraction in Phase 3.** The current free-form "research and answer" prompt is replaced by a per-question-type prompt that constrains the LLM to a single typed value with explicit length and format limits (e.g., phone is exactly 10 digits, statute citation is one line ≤ 60 chars). This makes scoring near-deterministic and dramatically reduces matcher complexity in [`exp_results/score_experiments.py`](../exp_results/score_experiments.py).
+6. **Two-layer programmatic-then-semantic validation.** Phase 5 runs a deterministic checklist (Layer 1a) before any LLM-as-judge cost is paid (Layer 1b), and only escalates to human review (Layer 2) for drafts that survive both.
 
 The doc is organized as **plan → reasoning → deliverables** in every phase so it functions as a design rationale, not a checklist.
 
@@ -27,16 +28,17 @@ The doc is organized as **plan → reasoning → deliverables** in every phase s
 | Topic | V1 | V2 | Why we changed it |
 |---|---|---|---|
 | Pilot scope | 5 states × pilot programs (proposal-aligned) | **MA × SNAP single cell** end-to-end | Breadth-first means failures are confounded across states/programs; depth-first isolates the architectural failure mode. |
-| Playbook schema | One schema per `(state, program, agency)` row, ~300 rows | **Three artifacts**: `state_law` (50), `agency_program` (300), `request_modules` (~6) | State-law facts duplicate 6× across programs in V1. Splitting eliminates drift and parallelizes research. |
-| Schema design timing | Schema first, then research populates it | **Gold letter first, schema decomposed from it** | Catches missing slots cheaply; gives end-to-end ground truth for Phase 5. |
+| Playbook schema | One schema per `(state, program, agency)` row, ~300 rows | **Three artifacts**: `state_law` (50), `agency_program` (300), `request_modules` (~8) | State-law facts duplicate 6× across programs in V1. Splitting eliminates drift and parallelizes research. |
+| Schema design timing | Schema first, then research populates it | **Gold request + successful production first, schema decomposed from both** | Catches missing slots cheaply; gives end-to-end ground truth for Phase 5; uses empirical evidence about what DTA actually produced. |
+| Production precedent | Not represented | **PI-provided DTA production package mined in Phase 1** | The successful MA DTA response includes Thomson Reuters / West Publishing CLEAR / ID Risk Analytics records, giving production-grounded request modules and benefits-tech system fields. |
 | Phase 3 prompt | Free-form "research and answer" with self-reported source | **Typed short-answer extraction** with length, format, and grounding constraints | Tight outputs collapse matcher complexity and reduce hallucination surface. |
-| Source grounding | Self-reported source URL in the answer JSON | **Retrieval-grounded** (web-tool-enabled models for V2; external retrieval for V3) | Bounds the LLM to retrieved evidence, eliminates URL hallucination. |
+| Source grounding | Self-reported source URL in the answer JSON | **Retrieval-grounded for web facts; production-document provenance for manually mined facts** | Bounds the LLM to retrieved web evidence while allowing local PDFs and public-records productions to support facts that are not on agency webpages. |
 | Certification criterion | Implicit: V1 §"Opt2" suggested ≥0.6 self-consistency on best model; proposal A1.3 says "100% agreement" | **Tiered: auto-certify / soft-certify / manual-queue**, combining cross-model + self-consistency + .gov source | 100% three-way agreement is unreachable per current Tier 1 results (Opus 76%, Gemma 44%, GPT-OSS 36%). Tiered criteria preserve volume while still routing hard cases to humans. |
-| Validation | "MuckRock LLM-as-judge" + human review | **Layer 1a programmatic checklist → Layer 1b LLM-as-judge → Layer 2 human review** | Most missing-slot defects are deterministic; we shouldn't pay LLM cost for them. |
+| Validation | "MuckRock LLM-as-judge" + human review | **Layer 1a programmatic checklist → Layer 1b DTA-precedent + MuckRock judge → Layer 2 human review** | Most missing-slot defects are deterministic; we shouldn't pay LLM cost for them. |
 | Question set | Hand-curated list of example questions | **Auto-derived from schema slots**, one question per field with type-specific scoring | Keeps questions in lockstep with schema; refactor-safe. |
-| Schema fields | 10 top-level keys | **Adds**: fee-waiver citation, expedited-processing citation, record definition, certification language, segregation clause, residency restriction, portal schema, state-specific quirks, plus reserved operational/tracking fields | Real FOIA letters (per FOIA Basics annotated request and BTAH model letter) need these to be valid. Reserved fields prevent schema migration pain when we add the campaign tracker. |
+| Schema fields | 10 top-level keys | **Adds**: fee-waiver citation, expedited-processing citation, record definition, certification language, segregation clause, residency restriction, portal schema, state-specific quirks, `benefits_tech_systems[]`, mixed evidence provenance, plus reserved operational/tracking fields | Real FOIA letters need legal facts; benefits-tech requests also need structured vendor/system facts. Reserved fields prevent schema migration pain when we add the campaign tracker. |
 | Promotion logic | "Pilot then scale" (1-step) | **Four explicit gates** (v1 → v2 → v3 → scale) with quantitative pass criteria | Each gate adds one axis of variation, so failures are diagnosable to the dimension that changed. |
-| Repo hygiene | `pipline/` (typo), `Drafting_prompt.text`, empty placeholders | **Recommends rename to `pipeline/`**, normalized prompt filenames, single canonical playbook artifact | Quality-of-life; not blocking but worth fixing before the doc tree calcifies. |
+| Repo hygiene | `pipline/` (typo), `drafting_prompt.text`, empty placeholders | **`pipeline/` rename completed**; normalized prompt filenames and canonical playbook artifacts remain pending | Quality-of-life; path cleanup is now done before the doc tree calcifies. |
 
 ---
 
@@ -45,11 +47,13 @@ The doc is organized as **plan → reasoning → deliverables** in every phase s
 ```mermaid
 flowchart TD
     subgraph p1 [Phase 1: Research and Schema]
-        gold[1a: Hand-write MA SNAP gold letter]
-        research[1b: GPT deep research dot gov allowlist]
-        schema[1c: Three-artifact schema design]
-        populate[1d: Manually populate MA state_law and MA SNAP agency_program]
-        gold --> schema
+        gold[1a: Recover or draft MA SNAP gold request]
+        precedent[1b: Mine successful DTA production package]
+        research[1c: GPT deep research dot gov allowlist]
+        schema[1d: Three-artifact schema design]
+        populate[1e: Manually populate MA state_law and MA SNAP agency_program]
+        gold --> precedent
+        precedent --> schema
         research --> schema
         schema --> populate
     end
@@ -70,13 +74,13 @@ flowchart TD
 
     subgraph p4 [Phase 4: Drafting]
         join[4a: Join state_law + agency_program + selected modules]
-        draftLLM[4b: Drafting LLM with MuckRock few-shot]
+        draftLLM[4b: Drafting LLM with DTA precedent + MuckRock few-shot]
         join --> draftLLM
     end
 
     subgraph p5 [Phase 5: Validation]
         layer1a[5a: Layer 1a programmatic checklist]
-        layer1b[5b: Layer 1b LLM-as-judge vs MuckRock]
+        layer1b[5b: Layer 1b LLM-as-judge vs DTA precedent + MuckRock]
         layer2[5c: Layer 2 human review]
         layer1a --> layer1b --> layer2
     end
@@ -89,8 +93,8 @@ flowchart TD
 ```
 
 Three things are flowing through the pipeline:
-- **Structured facts** (state law, agency contacts) — produced in Phase 1, validated in Phase 3, consumed in Phase 4.
-- **Modular content** (request modules per the proposal's A2.1 categories) — authored once, reused everywhere.
+- **Structured facts** (state law, agency contacts, benefits-tech system facts) — produced in Phase 1, validated in Phase 3 where web-extractable, consumed in Phase 4.
+- **Modular content** (request modules per the proposal's A2.1 categories) — seeded from the successful DTA production package, authored once, reused everywhere.
 - **Letters** — composed in Phase 4, validated in Phase 5, sent in Phase 6+ (out of V2 scope).
 
 ---
@@ -101,12 +105,12 @@ These principles will be repeated in shorthand at the bottom of each phase secti
 
 1. **Composable templating.** The LLM does not invent facts; it composes prose from validated structured slots. This is V1's core insight and V2 keeps it intact.
 2. **Three-artifact decomposition.** State-level legal facts, program-level operational facts, and content modules are different things and live in different files.
-3. **Spec-by-example.** Hand-write the desired output before designing the structure that produces it.
+3. **Spec-by-example.** Recover or hand-write the desired output before designing the structure that produces it.
 4. **Bounded LLM tasks.** Phase 3 is "extract one typed value with grounding." Phase 4 is "compose prose from structured input with no invention." Phase 5a is fully deterministic. The LLM has a small, well-typed job at every step.
-5. **Retrieval grounding wherever practical.** A self-reported source URL is not evidence; a quoted span fetched from a `.gov` page is.
+5. **Evidence grounding wherever practical.** A self-reported source URL is not evidence; a quoted span fetched from a `.gov` page is. A quoted span from a received production document is also evidence when the fact is not publicly available on the web.
 6. **Programmatic-before-semantic validation.** Cheap deterministic checks gate expensive LLM-as-judge checks.
 7. **Vertical pilot before horizontal scale.** Prove the architecture on MA SNAP before we add a state or a program.
-8. **Auditability over cleverness.** Every cell in the playbook has a `source_url`, a `quote`, a `retrieved_at` timestamp, and a confidence tier; every generated letter has a snapshot of the inputs that produced it.
+8. **Auditability over cleverness.** Every cell in the playbook has an evidence record (`url`, `local_pdf`, or `production_doc`), a quote, a retrieval or receipt date, and a confidence tier; every generated letter has a snapshot of the inputs that produced it.
 
 ---
 
@@ -118,7 +122,8 @@ V2's deliverables target **Massachusetts × SNAP** only. Concretely this means:
 - One file at `pipeline/playbook/agency_program/MA_SNAP.json`.
 - One benchmark CSV at `pipeline/benchmarks/MA_SNAP_benchmark.csv`.
 - One generated letter at `pipeline/generated_requests/MA_SNAP.txt` (plus snapshot).
-- Modules in `pipeline/request_modules/` are written generically (jurisdiction-independent), but only verified against MA SNAP for V2.
+- One precedent package at `pipeline/precedents/MA_DTA_ADS_2026/`, derived from [`pipeline/gold_letters/gold_letter.pdf`](gold_letters/gold_letter.pdf).
+- Modules in `pipeline/request_modules/` are written generically (jurisdiction-independent), seeded from the successful DTA production package, and only verified against MA SNAP for V2.
 
 Schemas at `pipeline/schemas/` are designed generically (so they work for all 50 states / 6 programs eventually), but only **populated** for MA SNAP in V2. Generality is in the schema; specificity is in the data.
 
@@ -126,12 +131,14 @@ Schemas at `pipeline/schemas/` are designed generically (so they work for all 50
 
 ## 5. Phase 1 — Research and Schema design
 
-### 5.1 Step 1a — Spec-by-example: hand-write the MA SNAP gold letter
+### 5.1 Step 1a — Spec-by-example: recover or draft the MA SNAP gold request
 
-**Plan.** A human (RA) hand-writes one complete, submittable Massachusetts public records request letter targeting SNAP at the Department of Transitional Assistance (DTA). Every word in the letter is then annotated as one of three categories:
+**Plan.** Start from the PI-provided successful production package at [`pipeline/gold_letters/gold_letter.pdf`](gold_letters/gold_letter.pdf). If the exact outbound public-records request is available, use it as the base text. If it is not available, reconstruct the request from the scope quoted in DTA's response letter, clearly mark it as reconstructed, and have a human (RA) turn it into one complete, submittable Massachusetts public records request letter targeting SNAP at the Department of Transitional Assistance (DTA).
+
+The DTA response is not itself the outbound gold request. It is evidence that a request with this scope succeeded and produced responsive records. The recovered or reconstructed request is then annotated word-by-word as one of three categories:
 
 - `slot:<schema-field>` — varies across (state, program); pulled from the playbook (e.g., `slot:state_law.public_records_law.citation`).
-- `module:<module-id>` — a content block authored once, applicable across jurisdictions (e.g., `module:vendors_contracts`).
+- `module:<module-id>` — a content block authored once, applicable across jurisdictions (e.g., `module:procurement_contracts_rfps`).
 - `boilerplate` — fixed wording that appears in every letter regardless of state or program (e.g., the closing courtesy line).
 
 The annotated version is committed alongside the unannotated one. The two together are the **schema spec**.
@@ -139,24 +146,49 @@ The annotated version is committed alongside the unannotated one. The two togeth
 **Reasoning.** This is the single highest-leverage step in V2.
 
 - The cost is one afternoon of human research. The benefit is that every schema gap, every missing module, every state-specific quirk surfaces *now*, before any LLM extraction runs at scale.
-- It also gives Phase 5 Layer 2 a concrete reference letter for edit-distance scoring. Without a gold letter, "is the LLM draft good?" is unanswerable.
+- It also gives Phase 5 Layer 2 a concrete reference request for edit-distance scoring. Without a gold request, "is the LLM draft good?" is unanswerable.
 - The annotation forces a binary decision per word: if a word doesn't fit `slot | module | boilerplate`, the schema is incomplete.
+- Using the DTA response as a success signal prevents us from optimizing for a legally plausible request that does not actually produce benefits-tech records.
 
 **Failure mode if skipped.** We design the schema in the abstract, run Phase 3 extraction, then in Phase 4 discover the LLM-drafted letter is missing a paragraph the state law actually requires. We then redesign the schema, re-run Phase 3 (re-paying token cost), and redo benchmarks.
 
 **Deliverables.**
 - [`pipeline/gold_letters/MA_SNAP.md`](pipeline/gold_letters/MA_SNAP.md) — the letter as it would be submitted.
 - `pipeline/gold_letters/MA_SNAP.annotated.md` — the same letter with every word tagged.
+- `pipeline/gold_letters/MA_SNAP.source_note.md` — whether the request text is exact outbound PRR text or reconstructed from DTA's response.
 
 **Cross-references for the human writer.**
+- PI-provided DTA production package — primary empirical precedent for request scope.
 - BTAH Public Records Request Guide model letter (Arkansas DHS example) — solid baseline format with named individuals and keyword strategy.
 - FOIA Basics annotated tech FOIA request — definitions block, format-of-production block, fee-waiver block, expedited-processing block.
 - NFOIC's MA-specific FOI sample letter — for state-statutory framing.
-- An existing successful MuckRock SNAP request — for tone parity.
+- Existing successful MuckRock SNAP / benefits-tech requests — secondary tone comparators.
 
 ---
 
-### 5.2 Step 1b — GPT deep research run
+### 5.2 Step 1b — Mine successful DTA production package
+
+**Plan.** Treat [`pipeline/gold_letters/gold_letter.pdf`](gold_letters/gold_letter.pdf) as a successful MA DTA public-records production package. OCR it if necessary, then manually inventory and extract:
+
+1. **Request scope that succeeded.** The response quotes a request for records about automated decision systems, algorithms, data-matching programs, artificial intelligence, machine learning, and predictive analytics used by DTA to assist with eligibility, fraud detection, or case-review flagging. V2 narrows implementation to SNAP, but preserves the broader phrasing because the successful request also named TAFDC and EAEDC.
+2. **Produced-document inventory.** Record each component of the production: DTA response letter, Thomson Reuters / West Publishing order form, product attachment, statement of work, and any enclosures or online-guide references.
+3. **Benefits-tech system facts.** Extract vendor, product, functionality, use case, pricing, term length, user seats, batch limits, data inputs, named deliverables, hosting, security, retention, support, and implementation milestones.
+4. **Request-module seeds.** Convert the production's record categories and produced-document types into reusable module seeds.
+
+**Reasoning.**
+- This package is stronger than a generic exemplar because it tells us which words caused DTA to search and produce responsive benefits-tech records.
+- The responsive records reveal fields that public webpages are unlikely to contain, such as pricing, batch limits, data-file specifications, master design documents, and source-data responsibilities.
+- Mining it before schema lock prevents us from under-modeling vendor systems as only `known_vendors` and `known_system_names`.
+
+**Deliverables.**
+- `pipeline/precedents/MA_DTA_ADS_2026/request_excerpt.md` — exact outbound text if available, otherwise the reconstructed scope quoted by DTA.
+- `pipeline/precedents/MA_DTA_ADS_2026/production_inventory.yaml` — one entry per produced document / attachment.
+- `pipeline/precedents/MA_DTA_ADS_2026/extracted_facts.yaml` — structured benefits-tech facts with production-document evidence.
+- `pipeline/precedents/MA_DTA_ADS_2026/request_module_seeds.yaml` — module candidates derived from the successful request and produced records.
+
+---
+
+### 5.3 Step 1c — GPT deep research run
 
 **Plan.** Run a focused deep research job to populate MA SNAP factual context. The prompt (proposed text below) constrains sources and demands per-field provenance.
 
@@ -213,6 +245,11 @@ Assistance Program (SNAP).
 8. Known SNAP eligibility / case-management system names used by DTA
    (e.g., "BEACON").
 9. Known vendors or contractors associated with those systems.
+10. Publicly available information about benefits-technology systems, if any,
+    including vendor names, product names, use cases, and public procurement
+    references. Do not use the PI-provided production package for this layer;
+    this layer is web-source-only and will later be reconciled against the
+    mined production package.
 
 ## Layer C: Sanity check
 Cross-check every Layer A entry against the National Freedom of Information
@@ -237,7 +274,7 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
 - The `.gov` allowlist is the cheapest hallucination guard for URLs; the verbatim quote requirement is the cheapest hallucination guard for facts.
 - "Worked example for one cell first" (MA → schema → generalize) is more reliable than "design schema in the abstract."
 - Asking deep research to cross-check against NFOIC catches disagreements early.
-- Asking it to fetch 5 MuckRock precedents kills two birds: gives Phase 4 few-shot examples and Phase 5 LLM-as-judge exemplars.
+- Asking it to fetch 5 MuckRock precedents gives Phase 4 secondary tone examples and Phase 5 comparative exemplars; the DTA production package remains the primary MA SNAP precedent.
 
 **Failure mode if skipped.** We start Phase 3 extraction blind to which fields are even findable on MA's public sites, and waste runs on questions that have no answer at scale.
 
@@ -247,7 +284,7 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
 
 ---
 
-### 5.3 Step 1c — Three-artifact schema design
+### 5.4 Step 1d — Three-artifact schema design
 
 **Plan.** Three schema files, all generic across states and programs:
 
@@ -308,12 +345,21 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["field", "source_url", "quote", "retrieved_at"],
+        "required": ["field", "source_type", "source_ref", "quote"],
+        "oneOf": [
+          { "required": ["retrieved_at"] },
+          { "required": ["received_at"] }
+        ],
         "properties": {
           "field": { "type": "string" },
-          "source_url": { "type": "string", "format": "uri" },
+          "source_type": { "type": "string", "enum": ["url", "local_pdf", "production_doc"] },
+          "source_ref": { "type": "string", "description": "URL, local file path, or production package document id." },
           "quote": { "type": "string" },
-          "retrieved_at": { "type": "string", "format": "date" }
+          "retrieved_at": { "type": "string", "format": "date" },
+          "received_at": { "type": "string", "format": "date" },
+          "page": { "type": ["integer", "null"] },
+          "document_title": { "type": ["string", "null"] },
+          "production_package_id": { "type": ["string", "null"] }
         }
       }
     },
@@ -380,6 +426,48 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
     },
     "known_system_names": { "type": "array", "items": { "type": "string" } },
     "known_vendors": { "type": "array", "items": { "type": "string" } },
+    "benefits_tech_systems": {
+      "type": "array",
+      "description": "Structured vendor/system facts. For the MA DTA precedent, examples include Thomson Reuters / West Publishing, CLEAR, CLEAR Government Investigations Advanced, ID Risk Analytics, and CLEAR ID Confirm.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "vendor_name": { "type": ["string", "null"] },
+          "product_names": { "type": "array", "items": { "type": "string" } },
+          "use_cases": { "type": "array", "items": { "type": "string" } },
+          "programs_covered": { "type": "array", "items": { "type": "string" } },
+          "contract_or_order_ids": { "type": "array", "items": { "type": "string" } },
+          "pricing_terms": { "type": ["string", "null"] },
+          "user_seats": { "type": ["integer", "null"] },
+          "batch_or_match_limits": { "type": ["string", "null"] },
+          "required_data_inputs": { "type": "array", "items": { "type": "string" } },
+          "named_deliverables": { "type": "array", "items": { "type": "string" } },
+          "hosting_security_retention": { "type": ["string", "null"] },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["field", "source_type", "source_ref", "quote"],
+              "oneOf": [
+                { "required": ["retrieved_at"] },
+                { "required": ["received_at"] }
+              ],
+              "properties": {
+                "field": { "type": "string" },
+                "source_type": { "type": "string", "enum": ["url", "local_pdf", "production_doc"] },
+                "source_ref": { "type": "string" },
+                "quote": { "type": "string" },
+                "retrieved_at": { "type": "string", "format": "date" },
+                "received_at": { "type": "string", "format": "date" },
+                "page": { "type": ["integer", "null"] },
+                "document_title": { "type": ["string", "null"] },
+                "production_package_id": { "type": ["string", "null"] }
+              }
+            }
+          }
+        }
+      }
+    },
     "keywords": { "type": "array", "items": { "type": "string" } },
 
     "_reserved_for_campaign_tracking": {
@@ -398,12 +486,21 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["field", "source_url", "quote", "retrieved_at"],
+        "required": ["field", "source_type", "source_ref", "quote"],
+        "oneOf": [
+          { "required": ["retrieved_at"] },
+          { "required": ["received_at"] }
+        ],
         "properties": {
           "field": { "type": "string" },
-          "source_url": { "type": "string", "format": "uri" },
+          "source_type": { "type": "string", "enum": ["url", "local_pdf", "production_doc"] },
+          "source_ref": { "type": "string", "description": "URL, local file path, or production package document id." },
           "quote": { "type": "string" },
-          "retrieved_at": { "type": "string", "format": "date" }
+          "retrieved_at": { "type": "string", "format": "date" },
+          "received_at": { "type": "string", "format": "date" },
+          "page": { "type": ["integer", "null"] },
+          "document_title": { "type": ["string", "null"] },
+          "production_package_id": { "type": ["string", "null"] }
         }
       }
     },
@@ -422,7 +519,7 @@ required: [id, title, request_text]
 properties:
   id:
     type: string
-    description: Stable slug, e.g. "ads_inventory".
+    description: Stable slug, e.g. "procurement_contracts_rfps".
   title:
     type: string
   request_text:
@@ -448,9 +545,21 @@ properties:
       e.g. ["fee_waiver.available"] for the fee-waiver paragraph.
 ```
 
+**Production-grounded module set for MA SNAP V2.** The initial request modules are seeded from the DTA production package, then generalized for other states/programs:
+
+- `procurement_contracts_rfps` — contracts, order forms, RFPs, amendments, renewals, pricing, subscriptions, and procurement correspondence for third-party benefits-tech systems.
+- `system_documentation` — internally developed or vendor-provided technical documentation, system descriptions, product attachments, and configuration materials.
+- `staff_use_policies_training` — user manuals, policy memos, training materials, online guide references, and staff instructions describing how tools are used in eligibility, fraud, or review workflows.
+- `validation_accuracy_audits` — validation studies, accuracy audits, quality-assurance reviews, bias/fairness reviews, and performance reports.
+- `implementation_deliverables` — data-file specification documents, master design documents, project-requirements/onboarding materials, go-live materials, and implementation schedules.
+- `data_inputs_and_dictionaries` — source data descriptions, data dictionaries, table/field lists, relational diagrams, data-retention policies, and transfer/VPN requirements.
+- `risk_alerts_thresholds_dashboards` — risk alerts, dashboard metrics, thresholds, scoring categories, aggregate reports, and review-session materials.
+- `vendor_support_change_requests` — help-desk terms, support tickets, customer-success reviews, quarterly account reviews, feature requests, new data-source requests, and change orders.
+
 **Reasoning.**
 - Splitting along cardinality and update cadence (50 vs. 300 vs. 6) is the cleanest decomposition. Editing MA's response deadline in V1 meant editing 6 program rows; in V2 it's one edit.
-- `evidence` at the row level (not buried inside each field) makes it cheap to walk through every grounded claim during human review.
+- `evidence` at the row level (not buried inside each field) makes it cheap to walk through every grounded claim during human review; the same shape supports `.gov` webpages and local production documents.
+- `benefits_tech_systems[]` prevents the MA DTA production facts from being flattened into generic vendor/system name lists. Pricing, seats, batch limits, data inputs, deliverables, and hosting/security/retention clauses are first-class facts because those are exactly the facts the successful production revealed.
 - Reserving operational fields now (under a clearly-marked `_reserved_for_campaign_tracking`) prevents a schema migration when Stage 2 of the project starts.
 - YAML for modules (vs. JSON) is deliberate: modules are wordy text blocks; YAML's literal-string blocks (`|`) are kinder to writers than escaping JSON quotes.
 
@@ -458,27 +567,28 @@ properties:
 
 ---
 
-### 5.4 Step 1d — Manually populate MA SNAP playbook
+### 5.5 Step 1e — Manually populate MA SNAP playbook
 
-**Plan.** Using the gold letter (1a) and deep research output (1b), a human writes:
+**Plan.** Using the gold request (1a), mined DTA production package (1b), and deep research output (1c), a human writes:
 
 - `pipeline/playbook/state_law/MA.json` — every Massachusetts state-law field, with `evidence[]` populated for each.
-- `pipeline/playbook/agency_program/MA_SNAP.json` — every MA SNAP operational field, same evidence requirement.
+- `pipeline/playbook/agency_program/MA_SNAP.json` — every MA SNAP operational field, same evidence requirement, including `benefits_tech_systems[]` facts mined from the DTA production where applicable.
 
-Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.annotated.md` must resolve to a populated, non-null path in the joined playbook. Any unresolved annotation is a schema gap and triggers a return to step 1c.
+Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.annotated.md` must resolve to a populated, non-null path in the joined playbook. Any unresolved annotation is a schema gap and triggers a return to step 1d.
 
 **Reasoning.**
 - Hand-written, evidence-cited playbook = the ground truth. Phase 3 evaluation in Phase 6's promotion criteria is "does the LLM extraction recover this hand-verified value?"
-- The structural validation against the annotated gold letter is the **closure check** for V2's design phase. Until it passes, we don't move to Phase 2.
+- The structural validation against the annotated gold request is the **closure check** for V2's design phase. Until it passes, we don't move to Phase 2.
+- The mined production package is also a closure check for the request modules: each produced-document type should either map to a module or be explicitly declared out of scope.
 
-**Deliverables.** Two populated JSON files; one human-readable diff report showing all gold-letter slots are populated.
+**Deliverables.** Two populated JSON files; one human-readable diff report showing all gold-request slots are populated.
 
 **Phase 1 design-principles check.**
 - Composable templating? Yes — the playbook is the structured spine.
 - Three-artifact decomposition? Yes — schemas split cleanly.
-- Spec-by-example? Yes — gold letter precedes schema lock.
+- Spec-by-example? Yes — gold request and successful production precede schema lock.
 - Bounded LLM tasks? N/A — Phase 1 is mostly human + deep research.
-- Retrieval grounding? Yes — every field has source URL + quote.
+- Evidence grounding? Yes — every field has mixed provenance + quote.
 - Auditability? Yes — `evidence[]` on every row.
 
 ---
@@ -533,6 +643,7 @@ Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.anno
 - A single source of truth (`question_spec.yaml`) keeps Phase 2 in lockstep with Phase 1. When a schema field is added, one file changes and the rest of the pipeline picks it up.
 - `answer_format` is the bridge between Phase 3 (prompts) and `score_experiments.py` (matchers). Today the matcher dispatch in [`exp_results/score_experiments.py:25-37`](../exp_results/score_experiments.py) classifies questions by keyword sniffing in the template; V2 makes this explicit and declarative.
 - `source_pattern` is the cheapest sanity gate on URLs the LLM returns — if the source URL doesn't match, it doesn't count toward auto-certify.
+- Production-document-only fields from `benefits_tech_systems[]` are still represented in the playbook and benchmark, but they are flagged as `extraction_mode: manual_production_doc` rather than sent through the web-only Phase 3 extractor.
 - Per-question `certification_threshold` lets us be strict about high-stakes fields (statute citation, agency name) and tolerant about low-stakes ones (alias list).
 
 ### 6.2 Step 2b — Hand-verify the MA SNAP benchmark
@@ -542,10 +653,10 @@ Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.anno
 **`pipeline/benchmarks/MA_SNAP_benchmark.csv`** columns:
 
 ```
-field_path, question_template, program, state, ground_truth, source_url, quote, retrieved_at, answer_format
+field_path, question_template, program, state, ground_truth, source_type, source_ref, quote, retrieved_at, received_at, page, document_title, production_package_id, answer_format, extraction_mode
 ```
 
-The `ground_truth` value is copied directly from the manually populated playbook (1d) — so the benchmark and the playbook are guaranteed consistent.
+The `ground_truth` value is copied directly from the manually populated playbook (1e) — so the benchmark and the playbook are guaranteed consistent. For web-extractable facts, `source_type=url`, `source_ref` is the URL, and `retrieved_at` is populated. For facts mined from the DTA production package, `source_type=local_pdf` or `production_doc`, `source_ref` points to the local package/document id, and `received_at` is populated.
 
 **Reasoning.**
 - Phase 3 evaluation (and the scoring in [`exp_results/score_experiments.py`](../exp_results/score_experiments.py)) needs a reference value to compare against.
@@ -553,7 +664,7 @@ The `ground_truth` value is copied directly from the manually populated playbook
 
 **Phase 2 design-principles check.**
 - Bounded LLM tasks? N/A — Phase 2 is all derivation.
-- Auditability? Yes — every benchmark row carries source URL + quote.
+- Auditability? Yes — every benchmark row carries mixed provenance + quote.
 
 **Deliverables.** `question_spec.yaml`, `MA_SNAP_benchmark.csv`.
 
@@ -615,6 +726,10 @@ Hard rules:
   a short reason. Do NOT guess.
 - The "quote" field MUST be a verbatim substring of the page at "source_url".
   Do not paraphrase.
+- This web extractor handles `extraction_mode: web` questions only. Facts that
+  are available only in `gold_letter.pdf` or another production document are
+  populated manually from Phase 1b and are not eligible for URL-only
+  auto-certification.
 
 Output: a single JSON object, no markdown fences, with exactly these keys:
   {
@@ -735,7 +850,7 @@ For MA SNAP at ~25 fields populated this is ~375 calls — comparable to today's
 **Phase 3 design-principles check.**
 - Bounded LLM tasks? Yes — one typed value per call.
 - Retrieval grounding? Yes — web-tool-enabled models for V2.
-- Auditability? Yes — every cell has source URL, quote, confidence, certification tier.
+- Auditability? Yes — every web-extracted cell has source URL, quote, confidence, and certification tier; production-only cells retain their Phase 1b local-document evidence.
 
 **Deliverables.**
 - `pipeline/prompts/extraction_short_answer.txt` — the full prompt.
@@ -748,7 +863,7 @@ For MA SNAP at ~25 fields populated this is ~375 calls — comparable to today's
 
 ### 8.1 Step 4a — Drafting prompt redesign
 
-**Plan.** Replace [`pipline/Drafting_prompt.text`](Drafting_prompt.text) with a structured prompt at `pipeline/prompts/drafting_prompt.txt`.
+**Plan.** Replace the current V1 skeleton [`pipeline/drafting_prompt.text`](drafting_prompt.text) with a structured prompt at `pipeline/prompts/drafting_prompt.txt`.
 
 **System prompt:**
 
@@ -793,8 +908,8 @@ modules        = numbered request items asking for specific record categories
 </required_slots>
 
 <few_shot>
-Example 1: <input_json> ... </input_json> -> <letter> ... </letter>
-Example 2: <input_json> ... </input_json> -> <letter> ... </letter>
+Primary example: DTA production-derived <input_json> ... </input_json> -> <letter> ... </letter>
+Secondary examples: MuckRock <input_json> ... </input_json> -> <letter> ... </letter>
 </few_shot>
 
 Compose the letter now.
@@ -803,15 +918,15 @@ Compose the letter now.
 **Reasoning.**
 - Forbidding placeholder phrases like "the agency" is the cheapest way to detect a missing slot — Phase 5a checks for them.
 - The `<validation>` JSON block makes Phase 5a deterministic: instead of pattern-matching the letter, we parse the validation block and check each declared slot location exists.
-- Few-shot from real successful MuckRock requests (gathered in 1b Layer D) is the strongest single quality lever for the drafting model.
+- The primary few-shot comes from the DTA production package because it is a known-successful MA benefits-tech request; MuckRock examples gathered in Phase 1c Layer D are secondary tone and structure comparators.
 
 ### 8.2 Step 4b — `generate_request.py` outline
 
 **Plan.** A new script that:
 
 1. Loads `pipeline/playbook/state_law/MA.json` and `pipeline/playbook/agency_program/MA_SNAP.json`; joins into one dict.
-2. Selects modules: for the MA SNAP pilot, all six (ADS inventory, vendors/contracts, audits/evaluations, policies/manuals, decision workflows) per the proposal A2.1.
-3. Renders the drafting prompt with the joined playbook + modules + required-slot list + 2-3 few-shot examples loaded from `pipeline/validation/muckrock_examples/`.
+2. Selects the eight production-grounded modules listed in Phase 1d: `procurement_contracts_rfps`, `system_documentation`, `staff_use_policies_training`, `validation_accuracy_audits`, `implementation_deliverables`, `data_inputs_and_dictionaries`, `risk_alerts_thresholds_dashboards`, and `vendor_support_change_requests`.
+3. Renders the drafting prompt with the joined playbook + modules + required-slot list + the DTA precedent loaded from `pipeline/precedents/MA_DTA_ADS_2026/` + 2-3 secondary examples loaded from `pipeline/validation/muckrock_examples/`.
 4. Calls the drafting LLM (single model: Claude Opus 4.7 or equivalent).
 5. Parses the `<letter>` and `<validation>` tags.
 6. Writes:
@@ -845,6 +960,9 @@ Compose the letter now.
 | Delivery format named | At least one of {electronic, PDF, email, mail} present. |
 | Fee-waiver paragraph iff `fee_waiver.available` | Mutual implication; substring check on `fee_waiver.statutory_citation`. |
 | Certification clause iff state requires | Substring match on `certification_text`. |
+| ADS scope terminology present | At least one term from each group appears: automated decision systems / algorithms / data-matching; eligibility / fraud / case review; SNAP. |
+| Production-proven record classes present | The letter asks for procurement records, system documentation, staff-use materials, and validation or accuracy records. |
+| Benefits-tech expansion modules present | If selected, implementation deliverables, data inputs/dictionaries, risk alerts/dashboards, and vendor support/change-request modules appear as distinct request items. |
 | No forbidden placeholder phrases | Regex for `\b(the agency\|the relevant statute\|the appropriate office)\b` returns 0 matches. |
 | Validation block round-trip | Each slot listed in `<validation>` is found at the declared location. |
 
@@ -854,11 +972,12 @@ Failure mode: any failed check returns the draft to Phase 4 with a structured er
 - Most defects in LLM-generated letters are of the "forgot to put in slot X" variety — that's deterministic and cheap to catch.
 - Returning structured errors (rather than free-text feedback) means Phase 4 can re-prompt the LLM with "Fix these 3 specific issues" rather than "Try again."
 
-### 9.2 Step 5b — Layer 1b: LLM-as-judge against MuckRock precedents
+### 9.2 Step 5b — Layer 1b: LLM-as-judge against DTA precedent + MuckRock precedents
 
 **Plan.** Only invoked if Layer 1a passes. The judge LLM gets:
 - The candidate draft.
-- 3 hand-picked successful MuckRock SNAP/benefits requests from `pipeline/validation/muckrock_examples/`.
+- The DTA production-derived request excerpt and production inventory from `pipeline/precedents/MA_DTA_ADS_2026/`.
+- 3 hand-picked successful MuckRock SNAP/benefits requests from `pipeline/validation/muckrock_examples/` as secondary comparators.
 - A structured prompt asking for a JSON diff: missing sections, scope mismatches, tone deviations.
 
 **Judge prompt skeleton:**
@@ -867,21 +986,29 @@ Failure mode: any failed check returns the draft to Phase 4 with a structured er
 You are reviewing a public records request draft against successful
 real-world precedents.
 
-Compare the candidate draft against the precedents on three dimensions:
+Treat the DTA production-derived precedent as the primary comparator because
+it is known to have produced MA benefits-tech records. Treat the MuckRock
+examples as secondary tone and structure comparators.
+
+Compare the candidate draft against the precedents on four dimensions:
 - structural completeness (does it have the same major sections?)
 - scope specificity (is it as specific about records as the precedents?)
+- production-proven coverage (does it preserve the DTA precedent's ADS
+  terminology, use cases, program scope, and record classes?)
 - tone (is the formality and assertiveness comparable?)
 
 Return JSON only:
 {
   "structural_completeness": {"score": 0-5, "missing": [...]},
   "scope_specificity":       {"score": 0-5, "vague_items": [...]},
+  "production_coverage":     {"score": 0-5, "missing": [...]},
   "tone":                    {"score": 0-5, "deviations": [...]}
 }
 ```
 
 **Reasoning.**
-- 1a catches structural omissions. 1b catches the things humans actually notice: the request is too vague, the tone is wrong, a section a successful requester would include is missing.
+- 1a catches structural omissions. 1b catches the things humans actually notice: the request is too vague, the tone is wrong, or a section that a successful requester included is missing.
+- Comparing against the DTA production package prevents the judge from rewarding polished but underpowered requests that omit the scope elements already proven to produce records.
 - JSON-only output makes the gate machine-readable for Phase 6 promotion-gate dashboards.
 
 ### 9.3 Step 5c — Layer 2: human review
@@ -894,7 +1021,7 @@ Return JSON only:
 **Pilot acceptance criterion:** ≤ 20% character edits to convert LLM draft into the human-approved final.
 
 **Reasoning.**
-- The gold letter is the *operational* quality target — the letter we'd actually want to send. Edit-distance to the gold is the most direct metric we have.
+- The gold request is the *operational* quality target — the letter we'd actually want to send. Edit-distance to the gold is the most direct metric we have.
 - Categorical acceptance status feeds promotion-gate dashboards.
 
 **Phase 5 design-principles check.**
@@ -911,7 +1038,7 @@ V2 itself stops at MA SNAP. Promotion to broader scope is gated by quantitative 
 
 | Gate | Scope | Pass criterion |
 |---|---|---|
-| **Pilot v1** (this doc) | MA × SNAP, single cell | (a) 100% of words in the gold letter trace to a slot, module, or boilerplate; (b) ≥ 80% of fields auto-certified in Phase 3; (c) Phase 5 Layer 2 acceptance is "accepted with minor edits" or better. |
+| **Pilot v1** (this doc) | MA × SNAP, single cell | (a) 100% of words in the gold request trace to a slot, module, or boilerplate; (b) ≥ 80% of web-extractable fields auto-certified in Phase 3; (c) Phase 5 Layer 2 acceptance is "accepted with minor edits" or better. |
 | **Pilot v2** | MA × {SNAP, Medicaid, WIC, LIHEAP, TANF, CHIP} | (a) ≥ 80% of LLM drafts accepted with ≤ 20% character edits; (b) Layer 1a passes ≥ 95% of drafts on first try. |
 | **Pilot v3** | 5 states × 2 programs (= original proposal A2.3 pilot scope) | Real-submission response rate ≥ 60% within statutory window; tracking for acknowledgements, fee estimates/waivers, clarifications, productions, denials, appeals. |
 | **Scale** | 50 states × 6 programs | Meets v3 criterion as the steady-state rate. |
@@ -930,21 +1057,22 @@ V2 itself stops at MA SNAP. Promotion to broader scope is gated by quantitative 
 | Some states / agencies require submission via a portal (NextRequest, JustFOIA, custom forms), not free-text email | High at scale | `agency_program.portal.required_fields` field reserved in V2; portal-driven submission gets a separate v3 sub-workflow that maps slots → form fields. |
 | Residency-restricted states (historically AR, TN, VA at various times) refuse non-resident requests | Low for SNAP-administering agencies, but real | `state_law.residency_restriction` boolean flagged; partner with in-state organizations per proposal §2.4. |
 | State agencies route SNAP to county offices (notably CA, NY) | Medium | `agency_program.sub_agency` captures this; module `recipient_block` handles county-level recipient lines. |
-| Government webpages change, breaking source URLs | Medium | `evidence[].retrieved_at` lets us detect staleness; periodic re-extraction. |
-| MuckRock precedents become outdated relative to current law | Low (slow drift) | Periodically refresh `muckrock_examples/`; date-tag each example. |
+| Government webpages change, breaking source URLs | Medium | `evidence[].retrieved_at` lets us detect stale web evidence; periodic re-extraction. |
+| Production-document facts cannot be independently re-fetched from the web | Medium | `source_type`, `source_ref`, `received_at`, `page`, and `production_package_id` preserve provenance; manual refresh happens only when a new production is received. |
+| MuckRock precedents become outdated relative to current law | Low (slow drift) | Periodically refresh `muckrock_examples/`; date-tag each example. The DTA production precedent remains primary for MA SNAP request scope unless superseded by a newer successful production. |
 | LLM hallucinates source URLs that 404 | Medium | Source URL pattern check in `question_spec.yaml`; future: add HTTP-status check before accepting a citation. |
 | Cost of multi-model × 5-runs at scale | Medium for 50-state | Per-field certification thresholds reduce the multi-model burden on tolerant fields; web-tool-enabled models will cost more per call but reduce need for re-runs. |
-| Schema drift between V2 and V3 (when retrieval is added) | Low | V2 schemas already accommodate retrieval (the `evidence[]` shape doesn't change). |
+| Schema drift between V2 and V3 (when retrieval is added) | Low | V2 schemas already accommodate web retrieval and production-document provenance (the `evidence[]` shape doesn't change). |
 
 ---
 
 ## 12. Repository cleanup checklist
 
-V2 recommends, in priority order:
+Current repository hygiene status, in priority order:
 
-1. **Rename `pipline/` → `pipeline/`.** Single typo; affects every file path in this doc. Recommended before the doc tree calcifies, but not blocking V2.
-2. **Move prompts under `pipeline/prompts/`** with consistent names: `extraction_short_answer.txt`, `drafting_prompt.txt`, `judge_prompt.txt`. Replaces today's [`pipline/Drafting_prompt.text`](Drafting_prompt.text) and the empty [`pipline/questions_prompt.txt`](questions_prompt.txt).
-3. **Promote `request_playbook.json` to a derived rendering.** The schemas and per-row playbook files are canonical; today's empty placeholders [`pipline/request_playbook.json`](request_playbook.json) and [`pipline/request_playbook.csv`](request_playbook.csv) should be deleted (and any export needed regenerated from the schemas).
+1. **Done: rename `pipline/` -> `pipeline/`.** The canonical workflow-design tree is now `pipeline/`, and root documentation links should use that path.
+2. **Still pending: move prompts under `pipeline/prompts/`** with consistent names: `extraction_short_answer.txt`, `drafting_prompt.txt`, `judge_prompt.txt`. This will replace today's [`pipeline/drafting_prompt.text`](drafting_prompt.text) and the empty [`pipeline/questions_prompt.txt`](questions_prompt.txt).
+3. **Still pending: promote `request_playbook.json` to a derived rendering.** The schemas and per-row playbook files are canonical; today's empty placeholders [`pipeline/request_playbook.json`](request_playbook.json) and [`pipeline/request_playbook.csv`](request_playbook.csv) should be deleted once the V2 schemas exist and any exports can be regenerated from them.
 4. **Long-term: move benchmark from `data/` to `pipeline/benchmarks/`.** V2 doesn't require this immediately to avoid breaking today's runners ([`exp_results/run_experiment.py`](../exp_results/run_experiment.py), [`exp_results/score_experiments.py`](../exp_results/score_experiments.py)), but the canonical home for question-set artifacts is the pipeline tree.
 
 ---
@@ -952,27 +1080,38 @@ V2 recommends, in priority order:
 ## 13. Proposed repository layout
 
 ```
-pipeline/                                    # was pipline/
+pipeline/                                    # canonical workflow-design tree
 ├── workflow_design_V2.md                    # this doc
 ├── workflow_design_V1.md                    # kept as design history
 ├── gold_letters/
+│   ├── gold_letter.pdf                      # PI-provided successful DTA production package
 │   ├── MA_SNAP.md                           # Phase 1a
-│   └── MA_SNAP.annotated.md
+│   ├── MA_SNAP.annotated.md
+│   └── MA_SNAP.source_note.md
+├── precedents/
+│   └── MA_DTA_ADS_2026/                     # Phase 1b
+│       ├── request_excerpt.md
+│       ├── production_inventory.yaml
+│       ├── extracted_facts.yaml
+│       └── request_module_seeds.yaml
 ├── research/
-│   └── MA_SNAP_research.md                  # Phase 1b
+│   └── MA_SNAP_research.md                  # Phase 1c
 ├── schemas/
-│   ├── state_law.schema.json                # Phase 1c
+│   ├── state_law.schema.json                # Phase 1d
 │   ├── agency_program.schema.json
 │   └── request_modules.schema.yaml
 ├── playbook/
-│   ├── state_law/MA.json                    # Phase 1d
+│   ├── state_law/MA.json                    # Phase 1e
 │   └── agency_program/MA_SNAP.json
 ├── request_modules/                         # written generically
-│   ├── ads_inventory.yaml
-│   ├── vendors_contracts.yaml
-│   ├── audits_evaluations.yaml
-│   ├── policies_manuals.yaml
-│   └── decision_workflows.yaml
+│   ├── procurement_contracts_rfps.yaml
+│   ├── system_documentation.yaml
+│   ├── staff_use_policies_training.yaml
+│   ├── validation_accuracy_audits.yaml
+│   ├── implementation_deliverables.yaml
+│   ├── data_inputs_and_dictionaries.yaml
+│   ├── risk_alerts_thresholds_dashboards.yaml
+│   └── vendor_support_change_requests.yaml
 ├── questions/
 │   └── question_spec.yaml                   # Phase 2a
 ├── benchmarks/
@@ -988,7 +1127,7 @@ pipeline/                                    # was pipline/
     ├── layer1a_checklist.py                 # Phase 5a
     ├── layer1b_judge_prompt.txt             # Phase 5b
     └── muckrock_examples/
-        └── ma_snap_*.md                     # Phase 1b Layer D output
+        └── ma_snap_*.md                     # Phase 1c Layer D output
 ```
 
 ---
@@ -1007,12 +1146,8 @@ V2 deliberately does **not** cover:
 
 ## 15. What I need from you (the RA / PI) to proceed
 
-To kick off Phase 1a immediately:
+Only one input would materially improve the next implementation step:
 
-1. **Confirm the rename `pipline/` → `pipeline/`** can happen now, or that we should defer (V2 lives in `pipline/` either way until then).
-2. **Confirm the 3-model lineup** for Phase 3: Claude Opus 4.7, GPT-5-class, Gemini 2.x-class — all with web tools. Or different.
-3. **Provide 1-2 successful MuckRock requests you consider exemplary** for SNAP / benefits-tech advocacy (else I'll pick from deep research Layer D output).
-4. **Confirm whether Phase 1a (gold letter) is a human deliverable** the RA produces, or whether you want me to draft a first cut for review.
-5. **Confirm OpenRouter is the API surface** for Phase 3 (or are we adding direct provider clients for the web-tool-enabled variants)?
+- **Optional: provide the original outbound PRR that led to `gold_letter.pdf`, if available.** If it is not available, V2 proceeds by reconstructing the operative request scope from DTA's response letter and marking `MA_SNAP.source_note.md` accordingly.
 
-Everything else V2 specifies has a defensible default; these five are the ones where your preference materially changes the build order.
+Everything else V2 specifies has a defensible default. The model lineup and OpenRouter/direct-provider choice still matter for implementation, but they no longer block the design update; the `pipline/` -> `pipeline/` rename is complete.

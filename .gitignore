@@ -7,6 +7,9 @@
 # Project proposal (private document)
 docs/Benefits_Decoded_Project_Proposal.pdf
 
+# Local source artifacts
+pipeline/gold_letters/gold_letter.pdf
+
 # Python
 __pycache__/
 *.pyc

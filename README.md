@@ -32,7 +32,7 @@ Assemble a versioned national dataset with provenance, uncertainty flags, and re
 
 ## Current Progress
 
-Stage 1 is in progress. We have completed an initial 5-state LLM-extraction benchmark, built a four-tier analysis pipeline over those results, and used the findings to design a next-stage workflow ([`pipline/workflow_design_V2.md`](pipline/workflow_design_V2.md)) that narrows Stage 1 to an end-to-end **Massachusetts x SNAP** vertical pilot before scaling.
+Stage 1 is in progress. We have completed an initial 5-state LLM-extraction benchmark, built a four-tier analysis pipeline over those results, and used the findings to design a next-stage workflow ([`pipeline/workflow_design_V2.md`](pipeline/workflow_design_V2.md)) that narrows Stage 1 to an end-to-end **Massachusetts x SNAP** vertical pilot before scaling.
 
 ### What has been completed
 
@@ -43,7 +43,8 @@ Stage 1 is in progress. We have completed an initial 5-state LLM-extraction benc
 - **Repository layout** — inputs under `data/`, experiment outputs under `exp_results/`, and project docs under `docs/`. The proposal PDF is expected at `docs/Benefits_Decoded_Project_Proposal.pdf` locally but is **not** committed (see [.gitignore](.gitignore)); clones receive code, benchmark, and results CSVs without that file.
 - **Initial experiment results** (375 raw rows, 75 summary rows, 75 scored rows) from three models: Google Gemma 4 26B A4B IT (paid), OpenAI GPT-OSS-120B (free), and Anthropic Claude Opus 4.7 (paid).
 - **Four-tier analysis pipeline** ([`exp_analysis/`](exp_analysis/)) over the 375 raw runs: headline accuracy, calibration and self-consistency, error taxonomy and consolidation gap, and source grounding. Regenerates plots, tables (CSV + Markdown), and per-tier summaries under [`reports/`](reports/), stitched together by [`reports/README.md`](reports/README.md).
-- **Workflow design docs** for the next stage of Stage 1: [`pipline/workflow_design_V1.md`](pipline/workflow_design_V1.md) introduces the composable-template idea (an LLM composing prose from validated structured slots, not inventing facts); [`pipline/workflow_design_V2.md`](pipline/workflow_design_V2.md) supersedes V1 with a vertical-pilot architecture for **MA x SNAP** -- gold-letter spec-by-example, three-artifact playbook decomposition (`state_law` / `agency_program` / `request_modules`), typed short-answer extraction, tiered certification, programmatic-then-semantic validation, and explicit promotion gates from MA x SNAP to multi-program and multi-state.
+- **Workflow design docs** for the next stage of Stage 1: [`pipeline/workflow_design_V1.md`](pipeline/workflow_design_V1.md) introduces the composable-template idea (an LLM composing prose from validated structured slots, not inventing facts); [`pipeline/workflow_design_V2.md`](pipeline/workflow_design_V2.md) supersedes V1 with a vertical-pilot architecture for **MA x SNAP** -- gold-letter spec-by-example, three-artifact playbook decomposition (`state_law` / `agency_program` / `request_modules`), typed short-answer extraction, tiered certification, programmatic-then-semantic validation, and explicit promotion gates from MA x SNAP to multi-program and multi-state.
+- **Repository hygiene update:** the workflow design directory has been renamed from the misspelled `pipline/` path to the canonical [`pipeline/`](pipeline/) path. The V1 prompt and empty playbook placeholders are still preserved there as design history until the V2 schema/prompts are implemented.
 
 ### Preliminary observations
 
@@ -59,7 +60,7 @@ Stage 1 is in progress. We have completed an initial 5-state LLM-extraction benc
 - **Source grounding is necessary but not sufficient:** `.gov` citation rates are similar across correct and incorrect cells (e.g. Gemma cites `.gov` on 99% of *incorrect* cells), and state-domain pattern matches are near-universal regardless of correctness. A URL filter alone won't gate quality -- V2 layers in verbatim-quote retrieval grounding on top of source-domain checks. See Tier 4 (`reports/plots/tier4/t4_02_gov_ratio_vs_correctness.png`).
 - **Scorer-strictness audit:** 9 of 36 incorrect cells still contain a ground-truth fragment (zip code, email domain, agency abbreviation, deadline number), suggesting some "incorrect" verdicts are matcher artifacts rather than model errors. V2's typed short-answer extraction is designed to collapse this ambiguity by constraining outputs at generation time rather than parsing free prose at scoring time.
 
-### Next steps (per [`pipline/workflow_design_V2.md`](pipline/workflow_design_V2.md))
+### Next steps (per [`pipeline/workflow_design_V2.md`](pipeline/workflow_design_V2.md))
 
 The immediate plan is the **MA x SNAP vertical pilot** (V2 Phases 1-5), running the full Stage 1 -> Stage 2 path on a single (state, program) cell before adding a second state or program:
 
@@ -104,9 +105,11 @@ The immediate plan is the **MA x SNAP vertical pilot** (V2 Phases 1-5), running 
 │   ├── tables/tier{1..4}/            # CSV + Markdown tables per tier
 │   ├── data/                         # Derived intermediates (e.g. raw_graded.csv)
 │   └── README.md                     # Stitched narrative + thumbnail index
-├── pipline/                          # Next-stage workflow design (typo to be renamed -> pipeline/)
+├── pipeline/                         # Next-stage workflow design and V1 artifacts
 │   ├── workflow_design_V1.md         # Initial composable-template concept (superseded)
 │   ├── workflow_design_V2.md         # Current design: MA x SNAP vertical pilot
+│   ├── gold_letters/
+│   │   └── gold_letter.pdf           # Local PI-provided DTA production package; not committed
 │   ├── drafting_prompt.text          # Drafting prompt skeleton (V1)
 │   ├── questions_prompt.txt          # Research prompt skeleton (V1, empty placeholder)
 │   ├── request_playbook.json         # V1 schema placeholder (empty; V2 splits into 3 schemas)
