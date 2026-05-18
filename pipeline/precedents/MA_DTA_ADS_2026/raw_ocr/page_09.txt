@@ -1,0 +1,55 @@
+parties. The below table reflects the estimated project schedule.
+upon project schedule as may be amended from time to time by mutual written agreement of the
+C. The deliverables identified in Section 2.A will be produced in accordance with the mutually agreed
+time of training.
+along with providing required training materials and user manuals at
+and completes Go-Live Training sessions as described in the SOW
+User Training
+User Training will be deemed accepted by Customer when TR delivers
+business and technical requirements for the System.
+Master Design Documents)
+By signing the MDD, Customer confirms this deliverable document its
+Report
+the batch results and Summary Report.
+One-time batch & SIU Summary
+The deliverable is accepted when Customer acknowledges receipt of
+the DFSD.
+Data Files Specifications Document
+The deliverable is accepted when Customer acknowledges receipt of
+Deliverable
+Acceptance Criteria
+Acceptance Criteria for the applicable deliverable, as written in the table below, is met.
+B. The deliverables described in Section 2.A above will be deemed approved and accepted when the
+4) Training - TR will deliver training as described in Section 1.B.
+configuration work begins.
+the MDD, which will be reviewed in detail with Customer and must be formally accepted before
+components and thresholds, and to identify data sources required. The result of the PROP is
+interviews to validate Customer's requirements. The PROP is used to configure dashboard
+Process (PROP) for this project. The PROP includes structured technical and business fit-gap
+3) Master Design Document ("MDD") - TR will follow the Project Requirements and Onboarding
+team.
+Report with supporting identity risk details and conduct a review session with the MA DTA
+current SNAP population (Est. 1.02M recipients). The TR SIU will prepare a Summary Briefing
+2) One-time batch and SIU Report - TR will deliver a one-time batch of ID Risk Analytics for the
+implementation.
+provides format detail, and describes the methodology for how data will be used in the System
+program data required for the System implementation. It describes entities and recipients,
+1) Data Files Specifications Document ("DFSD") - TR will provide a DFSD that details the
+A. TR will provide the following implementation deliverables:
+2. DELIVERABLES AND SCHEDULE OF PERFORMANCE
+absent a specified time period, no later than 30 days after the termination or expiration of this SOW.
+oversee the data destruction process in accordance with Customer's specific requirements or,
+case information as required by Customer. Following the successful export of the data, TR will
+of this SOW, the TR Information Security Officer will oversee the export of system results and/or
+I. Transition Upon Contract Expiration or Termination. Upon the expiration or early termination
+Customer's own data systems.
+System specific to Customer's requirements. The System will leverage program data from
+H. Set Up and Configuration Services. TR will provide set up and configuration services for the
+snapshots is an AES 256-bit Storage Access Network (SAN) storage device encrypted at rest.
+every business day and remain in the Azure data center. The storage system housing backup
+encrypted backups are performed by the Azure Recovery Services Vault, are taken at the end of
+G. Backup and Recovery Services. TR Will perform encrypted file and database level backups. The
+updates to the System.
+F. As a Software-as-a-Service offering, there will be frequent, non-intrusive enhancements and
+Page 3 of 6
+THOMSON REUTERS®

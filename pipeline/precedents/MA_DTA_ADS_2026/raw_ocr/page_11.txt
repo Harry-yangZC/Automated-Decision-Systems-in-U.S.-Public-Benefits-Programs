@@ -1,0 +1,45 @@
+and make decisions on behalf of Customer.
+3) Customer will maintain a current list of individuals, and their roles, who are authorized to act
+preparing complete and accurate sources files in a timely manner.
+identifying all appropriate source systems, understanding and labeling of data elements, and
+2) Customer is responsible for the accuracy and completeness of source data. This includes
+the System.
+Customer will establish the required VPN to provide TR with the data necessary to configure
+1) IDRA is accessed through a secure VPN connection. Within thirty (30) days of contract start,
+C. Data Integrity and Security
+to TR. This provides the primary and foreign key relations between the tables.
+3) Customer will provide a diagram of the relational model as it pertains to the source tables delivered
+dictionaries for all the data delivered to TR.
+2) Customer will provide reference descriptions for all reference codes in the data and data
+specified in PROP session I.
+data relating to applicants, recipients, and households, required to configure IDRA as
+1) Within thirty (30) days of contract start, Customer will provide TR with one (1) year of program
+B. Data
+of the analytics, user statistics, and new data sources and system functions.
+5) Customer will provide functional user participation in quarterly meetings to review the results
+schemas, column names, and other technical aspects of Customer's data.
+data systems and to respond to functional and technical questions relating to database
+4) Customer will provide TR access to functional and technical staff to identify data from source
+deliverables.
+configuring reports, and identifying sources of Customer data for the analytics; and approve
+workflows and procedures; validate requirements; assist in establishing thresholds,
+to describe, answer questions, and share documentation regarding current processes,
+3) Customer will ensure functional and technical user participation during the PROP sessions
+project plan.
+who will provide TR with the data necessary to configure the System according to approved
+2) Within seven (7) calendar days of contract start, Customer will assign a technical resource
+stakeholders who will participate in a kick-off.
+1) Within seven (7) calendar days of contract start, Customer will designate key project
+A. Staff Participation
+SOW in a timely manner:
+The following are Customer responsibilities necessary for TR to provide the services described in this
+5. CUSTOMER'S RESPONSIBILITIES
+anand.janakiraman@thomsonreuters.com
+Senior Project Manager
+Anand
+Janakiram
+TBD
+Customer
+West Publishing Corporation
+Page 5 of 6
+THOMSON REUTERS®

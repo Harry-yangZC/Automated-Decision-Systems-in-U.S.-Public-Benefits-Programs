@@ -1,0 +1,5 @@
+Records regarding any automated decision systems, algorithms,  data-matching programs, artificial intelligence, machine learning,  or predictive analytics used by the DTA (in the Program Integrity  or any other division) to assist in determining eligibility, detecting fraud, or flagging cases for review in the SNAP, TAFDC, and  EAEDC programs.
+1. Procurement contracts and RFPs for third-party software used for fraud detection, identity verification, or eligibility determination.
+2. Documentation of any internally developed software used for fraud detection, identity verification, or eligibility determination.
+3. User manuals, policy memos, or training materials describing how DTA staff utilize these tools to deny, reduce, or terminate benefits.
+4. Reports of any validation studies or accuracy audits conducted on these systems.

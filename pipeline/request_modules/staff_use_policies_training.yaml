@@ -1,0 +1,16 @@
+id: staff_use_policies_training
+title: Staff-use policies, manuals, and training materials
+request_text: |
+  User manuals, policy memos, training decks, recorded training sessions,
+  screen-specific user guides, and Online Guide content describing how
+  {{administering_agency_abbreviation}} staff use these systems to determine
+  eligibility, deny, reduce, or terminate {{program}} benefits, or refer
+  cases for further review.
+parametrized_slots:
+  - administering_agency_abbreviation
+  - program
+applicable_programs: []
+required_state_features: []
+seeded_from:
+  - doc03_west_publishing_sow
+  - doc04_dta_online_guide

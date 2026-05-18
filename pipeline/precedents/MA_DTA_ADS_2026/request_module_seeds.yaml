@@ -1,0 +1,151 @@
+# Request-module seeds — derived from the MA DTA production package.
+# These are the building blocks for V2 §5.4's eight production-grounded modules.
+# Each entry: which produced documents motivate the module, what record classes
+# the module asks for, and the verbatim production evidence that justifies it.
+#
+# These seeds get formalized into request_modules/*.yaml in Phase 1d once the
+# request_modules.schema.yaml is in place; they become the V1 of those modules.
+
+production_package_id: MA_DTA_ADS_2026
+
+modules:
+
+  - id: procurement_contracts_rfps
+    title: Procurement contracts, order forms, RFPs, and renewals
+    motivating_documents:
+      - doc02_tr_order_form
+    asks_for:
+      - Contracts, order forms, RFPs, amendments, renewals, and pricing
+      - Subscription terms (monthly charge, minimum term, automatic renewal,
+        cancellation notice, true-up/overage clauses)
+      - Subscriber/billing/shipping address records and account-contact records
+      - Schedule A / excluded-charges reference materials cited in the contract
+    production_evidence: |
+      The TR Order Form Q-08237974 (pp. 3-6) is itself a procurement-contract
+      production: order form + product attachment + signature page + multi-
+      year pricing schedule. Account #1000355212, signed Apr 22, 2024 by
+      Rachel Goldstein (DTA CFO), expires 5/13/2024 CT.
+    placeholder_slots:
+      - "{{state}}"                          # for "...in [state]..."
+      - "{{program}}"                        # for "...used to administer [program]..."
+      - "{{administering_agency.name}}"
+      - "{{time_scope_start}}"
+      - "{{time_scope_end}}"
+
+  - id: system_documentation
+    title: System and product documentation
+    motivating_documents:
+      - doc03_west_publishing_sow
+    asks_for:
+      - Internally developed or vendor-provided technical documentation
+      - System descriptions, product attachments, and configuration materials
+      - Online user manuals; embedded contextual help and FAQ content
+      - Architecture descriptions naming the hosting platform and integration
+        points (e.g. SaaS hosting, Azure, VPN-based data ingestion)
+    production_evidence: |
+      SOW Section 1.A (p. 7) describes the IDRA system, hosting on Azure,
+      and 30-user deployment. Section 7.B.3 (p. 7) commits to an Online
+      User Manual with embedded help and FAQs.
+
+  - id: staff_use_policies_training
+    title: Staff-use policies, manuals, and training materials
+    motivating_documents:
+      - doc03_west_publishing_sow
+      - doc04_dta_online_guide
+    asks_for:
+      - User manuals describing how staff utilize tools to assist with
+        eligibility, fraud detection, or case review
+      - Policy memos and training materials (recorded sessions, slide decks,
+        screen-specific user manuals, embedded help)
+      - Online Guide content referenced as responsive
+    production_evidence: |
+      SOW Section 1.B (p. 7): "TR will conduct one (1) remote training session
+      per 20 users, up to four (4) remote sessions... screen-specific user
+      manuals." DTA's response letter (p. 1) also names "DTA's Online Guide"
+      as responsive.
+
+  - id: validation_accuracy_audits
+    title: Validation studies, accuracy audits, and bias/fairness reviews
+    motivating_documents: []       # not produced in this package; original ask
+    asks_for:
+      - Validation studies and accuracy audits
+      - Quality-assurance reviews and performance reports
+      - Bias / fairness reviews
+      - Aggregate post-deployment metrics (false-positive rates, alert review
+        outcomes)
+    production_evidence: |
+      Listed as record category #4 in the outbound (per DTA's quotation, p. 1).
+      DTA produced no responsive documents in this category; the module
+      remains in the request because absence of audits is itself a
+      transparency signal.
+
+  - id: implementation_deliverables
+    title: Implementation deliverables and onboarding artifacts
+    motivating_documents:
+      - doc03_west_publishing_sow
+    asks_for:
+      - Data Files Specification Documents (DFSD) or equivalent data
+        specifications
+      - Master Design Documents (MDD) or fit-gap / project-requirements docs
+      - Project initiation, kick-off, and stakeholder lists
+      - Go-live materials, implementation schedules, milestone trackers
+    production_evidence: |
+      SOW Section 2.A (p. 9): "1) Data Files Specifications Document (DFSD) ...
+      3) Master Design Document (MDD) - TR will follow the Project Requirements
+      and Onboarding Process (PROP)... must be formally accepted before
+      configuration work begins." Timeline milestones in Section 2 / p. 10.
+
+  - id: data_inputs_and_dictionaries
+    title: Data inputs, dictionaries, and source-data specifications
+    motivating_documents:
+      - doc03_west_publishing_sow
+    asks_for:
+      - Data dictionaries delivered to or from the vendor
+      - Reference-code descriptions for fields in delivered data
+      - Relational model diagrams (primary/foreign key relations among source
+        tables)
+      - Lists of source data systems, schemas, and column-level metadata
+      - VPN and transfer-protocol requirements
+      - Data retention policies and post-termination destruction procedures
+    production_evidence: |
+      SOW Section 5.B (p. 11): "Customer will provide reference descriptions
+      for all reference codes in the data and data dictionaries for all the
+      data delivered to TR. ... Customer will provide a diagram of the
+      relational model as it pertains to the source tables delivered to TR."
+      SOW Section 5.C.1 (p. 11): "IDRA is accessed through a secure VPN
+      connection."
+
+  - id: risk_alerts_thresholds_dashboards
+    title: Risk alerts, configured thresholds, and dashboards
+    motivating_documents:
+      - doc03_west_publishing_sow
+    asks_for:
+      - Risk alerts and their configured detection logic (shared home address,
+        IP address, email address, deceased recipients, etc.)
+      - Dashboard metric specifications, thresholds, and scoring categories
+      - Aggregate dashboards displaying high/medium/low risk distributions
+      - SIU briefing reports and review-session materials
+      - Per-alert downloadable detail formats
+    production_evidence: |
+      SOW Section 1.A risk-alerts table (p. 7): "TR will configure and deploy
+      alerts to check for anomalies ... shared values (e.g., home address,
+      IP address, email address), deceased recipients ... Up to 30 alerts ...
+      Aggregate results will be displayed on the data dashboard."
+
+  - id: vendor_support_change_requests
+    title: Vendor support, customer success, and change requests
+    motivating_documents:
+      - doc03_west_publishing_sow
+    asks_for:
+      - Help-desk terms and severity-level response commitments
+      - Support tickets, escalations, and resolution records
+      - Customer-success reviews, quarterly account reviews, status meetings
+      - Feature requests, new-data-source requests, and change orders
+      - Customer Experience Analyst (CXA) and Special Investigations Unit
+        (SIU) engagement records
+    production_evidence: |
+      SOW Section 1.C / 1.D (pp. 7-8): Help Desk severity table (High 4 hr /
+      Medium 1 bd / Low 2 bd); SIU and Customer Success Team Support roles;
+      "Capturing Customer requests for new functionality, data sources, and
+      other constant improvement activities." SOW Section 6 (p. 12) notes:
+      "Any changes to the scope of work ... may result in a change order."

@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://benefits-decoded.brown.edu/schemas/state_law.schema.json",
+  "title": "state_law",
+  "description": "One row per U.S. state. Carries public-records-law facts that are jurisdiction-level (not program-level). See pipeline/workflow_design_V2.md §5.4. Schema is generic across all 50 states; only MA is populated in V2.",
+  "type": "object",
+  "required": ["state", "public_records_law", "evidence", "confidence", "needs_manual_review"],
+  "additionalProperties": false,
+  "properties": {
+    "state": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2,
+      "pattern": "^[A-Z]{2}$",
+      "description": "USPS two-letter state code."
+    },
+    "public_records_law": {
+      "type": "object",
+      "required": ["name", "citation"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Common name of the law, e.g. 'Massachusetts Public Records Law'."
+        },
+        "citation": {
+          "type": "string",
+          "description": "Primary statutory citation for access/response procedures, e.g. 'M.G.L. c. 66, § 10'."
+        },
+        "response_deadline": {
+          "type": ["string", "null"],
+          "description": "Primary response deadline in form 'N business days' or 'N calendar days'."
+        },
+        "response_deadline_citation": {
+          "type": ["string", "null"],
+          "description": "Statute subsection holding the response deadline, e.g. 'M.G.L. c. 66, § 10(a)'. Added in V2 §5.4 update post-1a annotation."
+        },
+        "extension": {
+          "type": ["object", "null"],
+          "description": "Structured replacement for V2 §5.4's single extension_clause string. Captures multi-stage extensions like MA's agency-initial + Supervisor-granted scheme. Any field may be null when not applicable.",
+          "additionalProperties": false,
+          "properties": {
+            "agency_initial_days": { "type": ["integer", "null"] },
+            "agency_initial_citation": { "type": ["string", "null"] },
+            "agency_initial_basis": { "type": ["string", "null"] },
+            "supervisor_extension_days": { "type": ["integer", "null"] },
+            "supervisor_extension_citation": { "type": ["string", "null"] },
+            "supervisor_extension_basis": { "type": ["string", "null"] }
+          }
+        },
+        "appeal_path": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "venue": { "type": ["string", "null"] },
+            "citation": { "type": ["string", "null"] },
+            "deadline_days": { "type": ["integer", "null"] },
+            "deadline_unit": {
+              "type": ["string", "null"],
+              "enum": ["business", "calendar", null]
+            },
+            "judicial_venue": {
+              "type": ["string", "null"],
+              "description": "Judicial-review venue distinct from administrative appeal venue. Added in V2 §5.4 update post-1a annotation."
+            },
+            "judicial_citation": { "type": ["string", "null"] }
+          }
+        },
+        "record_definition": {
+          "type": ["string", "null"],
+          "description": "Paraphrase of the statutory definition of 'public record'."
+        },
+        "record_definition_citation": {
+          "type": ["string", "null"],
+          "description": "Statute citation for the 'public record' definition, e.g. 'M.G.L. c. 4, § 7, cl. 26'. Added in V2 §5.4 update post-1a annotation."
+        },
+        "fee_waiver": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "available": { "type": "boolean" },
+            "statutory_citation": { "type": ["string", "null"] },
+            "qualifying_categories": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "required_assertions": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "expedited_processing": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "available": { "type": "boolean" },
+            "statutory_citation": { "type": ["string", "null"] },
+            "criteria": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "certification_required": { "type": "boolean" },
+        "certification_text": { "type": ["string", "null"] },
+        "segregation_clause": {
+          "type": ["string", "null"],
+          "description": "Statute or paraphrase of the rule that exempt portions can be withheld but non-exempt portions of the same record must still be produced."
+        },
+        "residency_restriction": {
+          "type": "boolean",
+          "description": "True if the law limits requests to in-state residents."
+        },
+        "oral_requests_allowed": {
+          "type": "boolean",
+          "description": "True if the law allows oral (in-person or phone) public records requests. New in V2 schema post-1c. Note: oral requests may not be sufficient for appeal."
+        },
+        "branch_carveouts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Branches/entities the Public Records Law does not apply to (e.g., legislature, courts, federal agencies). New in V2 schema post-1c."
+        },
+        "state_specific_quirks": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/evidence_row" }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "needs_manual_review": { "type": "boolean" }
+  },
+  "definitions": {
+    "evidence_row": {
+      "type": "object",
+      "required": ["field", "source_type", "source_ref", "quote"],
+      "oneOf": [
+        { "required": ["retrieved_at"] },
+        { "required": ["received_at"] }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Dotted path of the field this evidence supports, e.g. 'public_records_law.citation'."
+        },
+        "source_type": {
+          "type": "string",
+          "enum": ["url", "local_pdf", "production_doc"]
+        },
+        "source_ref": {
+          "type": "string",
+          "description": "URL, local file path, or production package document id."
+        },
+        "quote": {
+          "type": "string",
+          "description": "Verbatim span from the source supporting the field value."
+        },
+        "retrieved_at": { "type": "string", "format": "date" },
+        "received_at": { "type": "string", "format": "date" },
+        "page": { "type": ["integer", "null"] },
+        "document_title": { "type": ["string", "null"] },
+        "production_package_id": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

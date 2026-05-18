@@ -1,0 +1,53 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://benefits-decoded.brown.edu/schemas/request_modules.schema.yaml
+title: request_module
+description: |
+  One entry per content module (jurisdiction-independent request paragraph
+  or numbered record category). See pipeline/workflow_design_V2.md §5.4 and
+  §5.5. The eight production-grounded MA SNAP modules live at
+  pipeline/request_modules/*.yaml.
+
+type: object
+required: [id, title, request_text]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    description: |
+      Stable slug, e.g. "procurement_contracts_rfps". Must match the file
+      basename (id.yaml) and the {{module:<id>|...}} reference in the
+      annotated gold letter.
+  title:
+    type: string
+    description: Human-readable title used in the numbered list of the gold letter.
+  request_text:
+    type: string
+    description: |
+      The body of the request item, with placeholders in {{double-curly}}
+      form. Placeholders are resolved at draft time from the joined playbook.
+  parametrized_slots:
+    type: array
+    items: { type: string }
+    description: |
+      The placeholder names that appear in request_text, e.g.
+      ["program", "state", "time_scope_start"]. Each must be either a
+      _letter_meta.* path, a state_law.* path, or an agency_program.* path
+      reachable from the joined playbook.
+  applicable_programs:
+    type: array
+    items: { type: string }
+    description: |
+      Programs this module applies to. Empty list = applies to all programs.
+  required_state_features:
+    type: array
+    items: { type: string }
+    description: |
+      State-law features that must be present for this module to be valid.
+      e.g. ["fee_waiver.available"] for a hypothetical fee-waiver paragraph.
+  seeded_from:
+    type: array
+    items: { type: string }
+    description: |
+      IDs of the precedent documents this module's scope was derived from
+      (e.g. ["doc02_tr_order_form", "doc03_west_publishing_sow"] in the
+      MA_DTA_ADS_2026 production package).

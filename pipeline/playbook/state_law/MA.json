@@ -1,0 +1,205 @@
+{
+  "state": "MA",
+  "public_records_law": {
+    "name": "Massachusetts Public Records Law",
+    "citation": "M.G.L. c. 66, § 10",
+    "response_deadline": "10 business days",
+    "response_deadline_citation": "M.G.L. c. 66, § 10(a)",
+    "extension": {
+      "agency_initial_days": 15,
+      "agency_initial_citation": "M.G.L. c. 66, § 10(b)(vi)",
+      "agency_initial_basis": "Magnitude or difficulty of the request, or multiple requests from the same requester, that unduly burden the agency's other responsibilities. Agency must so inform the requester in writing not later than 10 business days after initial receipt.",
+      "supervisor_extension_days": 20,
+      "supervisor_extension_citation": "M.G.L. c. 66, § 10",
+      "supervisor_extension_basis": "Single additional extension up to 20 business days for an agency, on a showing of good cause to the Supervisor of Records. Municipalities may receive up to 30 business days."
+    },
+    "appeal_path": {
+      "venue": "Supervisor of Public Records, Office of the Secretary of the Commonwealth",
+      "citation": "M.G.L. c. 66, § 10A",
+      "deadline_days": 90,
+      "deadline_unit": "calendar",
+      "judicial_venue": "Superior Court (Suffolk Superior Court for state agencies)",
+      "judicial_citation": "M.G.L. c. 66, § 10A(c)"
+    },
+    "record_definition": "All books, papers, maps, photographs, recorded tapes, financial statements, statistical tabulations, or other documentary materials or data, regardless of physical form or characteristics, made or received by any officer or employee of any covered agency, executive office, department, board, commission, bureau, division or authority of the commonwealth, unless they fall within an enumerated statutory exemption.",
+    "record_definition_citation": "M.G.L. c. 4, § 7, cl. 26",
+    "fee_waiver": {
+      "available": true,
+      "statutory_citation": "M.G.L. c. 66, § 10(d)(v)",
+      "qualifying_categories": [
+        "public_interest_and_not_primarily_commercial",
+        "lacks_financial_ability_to_pay"
+      ],
+      "required_assertions": [
+        "Disclosure is in the public interest because it is likely to contribute significantly to public understanding of the operations or activities of the government.",
+        "Disclosure is not primarily in the commercial interest of the requester.",
+        "Or, alternatively, the requester lacks the financial ability to pay the full amount of the reasonable fee."
+      ]
+    },
+    "expedited_processing": {
+      "available": false,
+      "statutory_citation": null,
+      "criteria": []
+    },
+    "certification_required": false,
+    "certification_text": null,
+    "segregation_clause": "Exempt portions of a public record may be withheld, but the non-exempt portions of the same record must still be produced as a segregable portion. Furnishing a segregable portion of a public record is not deemed to be creation of a new record.",
+    "residency_restriction": false,
+    "oral_requests_allowed": true,
+    "branch_carveouts": [
+      "federal agencies",
+      "Massachusetts legislature",
+      "Massachusetts courts"
+    ],
+    "state_specific_quirks": [
+      "Oral requests are permitted but a written request is required to appeal to the Supervisor of Records.",
+      "The Public Records Law does not apply to records held by federal agencies, the legislature, or the courts of the Commonwealth.",
+      "Massachusetts has a notably complicated two-stage extension structure: agency-initial up to 15 business days under § 10(b)(vi), plus a single Supervisor-granted extension up to 20 business days on a showing of good cause.",
+      "Outsourced contractor-held records remain public records: records created in fulfillment of obligations of a contract with a governmental body must be made available even when held by a third-party vendor."
+    ]
+  },
+  "evidence": [
+    {
+      "field": "public_records_law.name",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/download/guide.pdf",
+      "quote": "The Massachusetts Public Records Law (Public Records Law) and its Regulations provide that each person has a right of access to public information.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.citation",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/public-records-law/public-records-request.htm",
+      "quote": "Massachusetts Public Records Law, found at M.G.L. c. 66, § 10, applies to records made or received by a Massachusetts agency or municipality.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.response_deadline",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleX/Chapter66/Section10",
+      "quote": "Section 10. (a) A records access officer appointed pursuant to section 6A, or a designee, shall at reasonable times and without unreasonable delay permit inspection or furnish a copy of any public record... or any segregable portion of a public record, not later than 10 business days following the receipt of the request...",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.response_deadline_citation",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleX/Chapter66/Section10",
+      "quote": "Section 10. (a) A records access officer appointed pursuant to section 6A, or a designee, shall at reasonable times and without unreasonable delay permit inspection or furnish a copy of any public record... not later than 10 business days following the receipt of the request...",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.extension.agency_initial_days",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleX/Chapter66/Section10",
+      "quote": "(vi) identify a reasonable timeframe in which the agency or municipality shall produce the public records sought; provided, that for an agency, the timeframe shall not exceed 15 business days following the initial receipt of the request for public records...",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.extension.supervisor_extension_days",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleX/Chapter66/Section10",
+      "quote": "Upon a showing of good cause, the supervisor of records may grant a single extension to an agency not to exceed 20 business days and a single extension to a municipality not to exceed 30 business days.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.fee_waiver.statutory_citation",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleX/Chapter66/Section10",
+      "quote": "(v) the records access officer may waive or reduce the amount of any fee charged under this subsection upon a showing that disclosure of a requested record is in the public interest because it is likely to contribute significantly to public understanding of the operations or activities of the government and is not primarily in the commercial interest of the requestor, or upon a showing that the requestor lacks the financial ability to pay the full amount of the reasonable fee;",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.expedited_processing.available",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleX/Chapter66/Section10",
+      "quote": "Section 10 does not contain a separate expedited-processing provision. Two independent deep-research passes on malegislature.gov, sec.state.ma.us, and rcfp.org returned NOT FOUND for any expedited-processing clause.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.appeal_path.venue",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/public-records-law/appealing-a-denial.htm",
+      "quote": "If your public records request is denied, you can appeal to the Supervisor of Records.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "public_records_law.appeal_path.citation",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleX/Chapter66/Section10A",
+      "quote": "Section 10A. (a) If an agency or municipality fails to comply with a requirement of section 10 or issues a response the requestor believes in violation of section 10, the person who submitted the initial request for public records may petition the supervisor of records for a determination as to whether a violation has occurred.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.appeal_path.deadline_days",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/public-records-law/appealing-a-denial.htm",
+      "quote": "You must file your appeal within 90 calendar days of the original request. If you received a response, you can appeal within 90 days of the response.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "public_records_law.appeal_path.judicial_venue",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/public-records-law/public-records-request.htm",
+      "quote": "You may also seek judicial review through civil action in superior court, under M.G.L. c. 66, § 10A(c).",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "public_records_law.record_definition",
+      "source_type": "url",
+      "source_ref": "https://malegislature.gov/Laws/GeneralLaws/PartI/TitleI/Chapter4/Section7",
+      "quote": "Twenty-sixth, ''Public records'' shall mean all books, papers, maps, photographs, recorded tapes, financial statements, statistical tabulations, or other documentary materials or data, regardless of physical form or characteristics, made or received by any officer or employee of any agency, executive office, department, board, commission, bureau, division or authority of the commonwealth... unless such materials or data fall within the following exemptions...",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.record_definition_citation",
+      "source_type": "url",
+      "source_ref": "https://www.rcfp.org/open-government-guide/massachusetts/",
+      "quote": "What is generally called the 'Public Records Law' is found primarily in two chapters of the General Laws. The first is the definition of 'public records,' which appears in G.L. c. 4, § 7, cl. 26. The procedures for obtaining access to such records are set forth principally in G.L. c. 66, § 10.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "public_records_law.segregation_clause",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/download/guide.pdf",
+      "quote": "Furnishing a segregable portion of a public record shall not be deemed to be creation of a new record. It is also important to note that furnishing an extract of existing data is not considered creation of a new record...",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.certification_required",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/download/guide.pdf",
+      "quote": "The MA Public Records Law does not impose a required certification or oath on the requester. Two independent deep-research passes on the Secretary of the Commonwealth's guide, the statute, and rcfp.org returned NOT FOUND for any required certification language.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.residency_restriction",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/public-records-law/public-records-request.htm",
+      "quote": "Anyone may request records from an RAO.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.oral_requests_allowed",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/public-records-law/public-records-request.htm",
+      "quote": "You can make a records request verbally, in person, or in writing. However, you'll need a written request to file an appeal with the Supervisor of Records.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.branch_carveouts",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/download/guide.pdf",
+      "quote": "The Public Records Law does not apply to records held by federal agencies, the legislature or the courts of the Commonwealth.",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "field": "public_records_law.state_specific_quirks",
+      "source_type": "url",
+      "source_ref": "https://www.rcfp.org/open-government-guide/massachusetts/",
+      "quote": "When a governmental body outsources the provision of certain governmental services to private third parties, '[a]ll records created in fulfillment of the obligations of the contract are government records,' and such records must be made available to the public even when they are in the hands of the third-party vendor.",
+      "retrieved_at": "2026-05-18"
+    }
+  ],
+  "confidence": "high",
+  "needs_manual_review": false
+}

@@ -1,0 +1,45 @@
+Title:
+Dir Comm Strategy & Policy
+Title:
+Chief Financial Officer
+Printed: Rachel Goldstein
+Printed:
+Julie Thomas
+By:
+3DF89B4D55954F9...
+By:
+Rachel goldate
+| Julie thomas
+- DocuSigned by:
+Assistance
+West Publishing Corporation
+Massachusetts Department of Transitional
+Agreed to and accepted by:
+disclosure agreement be executed between TR and the resource(s).
+services performed, or work products delivered, under this SOW, TR will require that a non-
+• If Customer intends to include a third-party resource(s) (e.g., a claims processing vendor) in the
+• Any changes to the scope of work as described in Section 1 of this SOW may result in a change
+change order.
+for the System, will result in delays to the proposed implementation schedule and may result in a
+requested formatting, or responses to clarifying questions surrounding the configuration of the data
+technical/program feedback. Any delay in the delivery of the data, completeness of the data set,
+• All project timelines are based upon the identified delivery timelines for program data and
+TR makes the following assumptions applicable to this SOW:
+6. ASSUMPTIONS
+industry standard secure protocols and ciphers.
+8) TR recommends the use of Chromium based browsers capable of supporting minimum
+ISO@PonderaSolutions.com.
+applicable laws) provided by TR, Customer will report any such event to
+7) Within 72 hours of an unauthorized use or disclosure of protected information (under
+termination.
+data for the duration of an active subscription and will destroy it within 30 days of subscription
+policy. If TR does not receive Customer's retention policy as stated, TR will retain Customer
+6) Within forty-five (45) days of contract start, Customer will provide TR with its data retention
+safeguard the confidentiality, integrity, and availability of protected data.
+applicable to the size and complexity of the organization, in its computing environment to
+5) Customer will maintain industry-standard general IT computer and application controls,
+obtained through the System or TR's employees.
+the organization, to prevent the unauthorized use or disclosure of protected information
+4) Customer will employ industry-standard safeguards, applicable to the size and complexity of
+Page 6 of 6
+THOMSON REUTERS®

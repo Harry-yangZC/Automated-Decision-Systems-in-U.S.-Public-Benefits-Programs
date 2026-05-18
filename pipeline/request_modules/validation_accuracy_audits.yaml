@@ -1,0 +1,10 @@
+id: validation_accuracy_audits
+title: Validation studies, accuracy audits, and bias or fairness reviews
+request_text: |
+  Validation studies, accuracy audits, quality-assurance reviews, bias
+  or fairness reviews, performance reports, false-positive analyses, and
+  aggregate post-deployment metrics for these systems.
+parametrized_slots: []
+applicable_programs: []
+required_state_features: []
+seeded_from: []

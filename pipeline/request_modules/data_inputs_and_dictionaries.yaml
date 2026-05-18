@@ -1,0 +1,13 @@
+id: data_inputs_and_dictionaries
+title: Data inputs, dictionaries, and source-data specifications
+request_text: |
+  Data dictionaries, reference-code descriptions, source-data field lists,
+  relational-model diagrams, lists of source data systems and tables shared
+  with vendors, VPN and other transfer-protocol requirements, and data
+  retention and post-termination destruction policies governing data shared
+  with these systems.
+parametrized_slots: []
+applicable_programs: []
+required_state_features: []
+seeded_from:
+  - doc03_west_publishing_sow

@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://benefits-decoded.brown.edu/schemas/agency_program.schema.json",
+  "title": "agency_program",
+  "description": "One row per (state, program). Carries agency-program operational facts: administering agency, RAO, contact, portal, benefits-tech systems. See pipeline/workflow_design_V2.md §5.4. Generic across all 50 states × 6 programs; only MA × SNAP is populated in V2.",
+  "type": "object",
+  "required": ["state", "program", "administering_agency", "evidence", "confidence", "needs_manual_review"],
+  "additionalProperties": false,
+  "properties": {
+    "state": { "type": "string", "minLength": 2, "maxLength": 2, "pattern": "^[A-Z]{2}$" },
+    "program": { "type": "string", "description": "Canonical short program name, e.g. 'SNAP'." },
+    "program_aliases": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Other names by which the state refers to the program."
+    },
+    "administering_agency": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "abbreviation": { "type": ["string", "null"] }
+      }
+    },
+    "sub_agency": {
+      "type": ["string", "null"],
+      "description": "Division or bureau within the administering agency that handles this program's eligibility/case management, if distinct."
+    },
+    "records_officer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "title": {
+          "type": ["string", "null"],
+          "description": "Public-records role title (typically 'Records Access Officer' in MA)."
+        },
+        "org_title": {
+          "type": ["string", "null"],
+          "description": "Organizational/job title separate from PRR role (e.g., 'Deputy General Counsel'). Added in V2 schema post-1c to disambiguate from 'title'."
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "email": { "type": ["string", "null"], "format": "email" },
+        "phone": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9]{10}$",
+          "description": "Exactly 10 digits, no formatting."
+        },
+        "address_line1": { "type": ["string", "null"] },
+        "address_line2": { "type": ["string", "null"] },
+        "city": { "type": ["string", "null"] },
+        "state": { "type": ["string", "null"], "pattern": "^[A-Z]{2}$" },
+        "zip": { "type": ["string", "null"] }
+      }
+    },
+    "portal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "url": { "type": ["string", "null"], "format": "uri" },
+        "required_fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "submission_methods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["email", "mail", "portal", "fax", "in_person", "phone"]
+      }
+    },
+    "known_system_names": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "known_vendors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "benefits_tech_systems": {
+      "type": "array",
+      "description": "Structured vendor/system facts. For the MA DTA precedent, examples include Thomson Reuters / West Publishing CLEAR and ID Risk Analytics. See pipeline/precedents/MA_DTA_ADS_2026/extracted_facts.yaml.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "vendor_name": { "type": ["string", "null"] },
+          "product_names": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "use_cases": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "programs_covered": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "contract_or_order_ids": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "pricing_terms": { "type": ["string", "null"] },
+          "user_seats": { "type": ["integer", "null"] },
+          "batch_or_match_limits": { "type": ["string", "null"] },
+          "required_data_inputs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "named_deliverables": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "hosting_security_retention": { "type": ["string", "null"] },
+          "evidence": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/evidence_row" }
+          }
+        }
+      }
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "_reserved_for_campaign_tracking": {
+      "description": "Fields reserved for downstream Stage-2/3 use; do not populate in V2.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "submission_status": {
+          "type": "string",
+          "enum": ["drafted", "reviewed", "sent", "acknowledged", "rolling", "fulfilled", "denied", "appealed"]
+        },
+        "tracking_id": { "type": ["string", "null"] },
+        "date_sent": { "type": ["string", "null"], "format": "date" },
+        "date_first_response": { "type": ["string", "null"], "format": "date" },
+        "date_final_response": { "type": ["string", "null"], "format": "date" },
+        "appeal_status": { "type": ["string", "null"] }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/evidence_row" }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "needs_manual_review": { "type": "boolean" }
+  },
+  "definitions": {
+    "evidence_row": {
+      "type": "object",
+      "required": ["field", "source_type", "source_ref", "quote"],
+      "oneOf": [
+        { "required": ["retrieved_at"] },
+        { "required": ["received_at"] }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "field": { "type": "string" },
+        "source_type": {
+          "type": "string",
+          "enum": ["url", "local_pdf", "production_doc"]
+        },
+        "source_ref": { "type": "string" },
+        "quote": { "type": "string" },
+        "retrieved_at": { "type": "string", "format": "date" },
+        "received_at": { "type": "string", "format": "date" },
+        "page": { "type": ["integer", "null"] },
+        "document_title": { "type": ["string", "null"] },
+        "production_package_id": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

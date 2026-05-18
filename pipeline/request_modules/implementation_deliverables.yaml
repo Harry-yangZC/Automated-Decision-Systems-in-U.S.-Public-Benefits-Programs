@@ -1,0 +1,13 @@
+id: implementation_deliverables
+title: Implementation deliverables and onboarding artifacts
+request_text: |
+  Data-file specifications documents (DFSDs), master design documents
+  (MDDs), project requirements and onboarding (PROP) materials, kick-off
+  and stakeholder lists, go-live materials, and implementation schedules
+  associated with deploying these systems for {{program}}.
+parametrized_slots:
+  - program
+applicable_programs: []
+required_state_features: []
+seeded_from:
+  - doc03_west_publishing_sow

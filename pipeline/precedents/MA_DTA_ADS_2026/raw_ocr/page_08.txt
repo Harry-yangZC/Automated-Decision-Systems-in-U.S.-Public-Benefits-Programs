@@ -1,0 +1,56 @@
+industry standard security protocols and ciphers.
+E. Hosting Services. The System is hosted on the Microsoft Azure platform and data centers, which
+improvement activities
+4) Capturing Customer requests for new functionality, data sources, and other constant
+3) Working with the Help Desk to address requests for support
+The assigned CXA member will assist in the following activities:
+2) Participating in Customer investigative and enforcement activities, as requested.
+1) Interpreting the results from the System
+The assigned SIU member will assist Customer in the following activities:
+activities such as status meetings, routine account reviews, etc.
+LIVE. The CA serves as the single point of contact for post-implementation and coordinates
+Success Team (Customer Experience Analyst - CXA) to work with your users post-Production GO
+Customer's investigations and enforcement staff. TR will also assign a member of the Customer
+functional and investigative arm of TR. A member of the SIU will be assigned to work with the
+D. Special Investigations Unit (SIU) and Customer Success Team Support. The SIU is the
+unaffected.
+performance and/or system integrity is
+or a minor deficiency. The overall
+such that the impact is an inconvenience
+nor the Customer's access to the System
+LOW
+An issue that impacts neither the System
+Two (2) business days
+operation can continue with workarounds.
+temporary workarounds exist. Normal
+operate
+properly
+but acceptable
+that important features or functions do not
+the production System is impacted such
+users or a portion of the System. Use of
+Medium
+An issue that impacts multiple Customer One (1) business day
+no workaround.
+or System functionality for which there is
+such that there is complete loss of service
+use of the production System is impacted
+users of the System. The entire or partial
+High
+An urgent issue that impacts all Customer
+Four (4) hours
+Severity Level Description
+Issue Severity Level
+Issue Response Time
+severity level:
+description of what defines the severity of a support ticket, and the response time for each
+urgency and impact. The following table indicates the severity levels for support tickets, a
+depending on its severity level. TR identifies three support ticket severity levels based on
+3) Every support ticket receives a tracking number and is assigned to a support professional
+c. Screenshots of the dashboard or system screen related to the problem (if applicable).
+b. Description of the events leading up to the need to create a support ticket (if applicable)
+a. Description of the issue and an assessment of its severity
+request must include:
+stakeholders / managers can monitor the status of support tickets at any time. Each support
+Page 2 of 6
+THOMSON REUTERS®

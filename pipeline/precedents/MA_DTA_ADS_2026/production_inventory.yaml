@@ -1,0 +1,146 @@
+# Production inventory — MA DTA, PRR-2026-ADS (received Feb 13, 2026)
+# Source file: pipeline/gold_letters/gold_letter.pdf (12 pages, 4.1 MB).
+# Created from layout-faithful PyMuPDF extraction (pp. 1-2) and macOS Vision
+# OCR (pp. 3-12). Raw text is in pipeline/precedents/MA_DTA_ADS_2026/raw_ocr/.
+
+production_package_id: MA_DTA_ADS_2026
+requester: Tomo Lazovich (Brown University)
+submitted_at: 2026-01-27
+received_at: 2026-02-13
+responding_agency: Massachusetts Department of Transitional Assistance
+responding_officer:
+  name: Lauren Picone
+  title: General Counsel
+  phone: "6173488520"            # exactly 10 digits per V2 §7.1
+appeal_pathway:
+  statute: M.G.L. c. 66, § 10A
+  venues:
+    - Supervisor of Public Records, Office of the Secretary of the Commonwealth
+    - Suffolk Superior Court (judicial review)
+
+documents:
+  - id: doc01_response_letter
+    title: DTA Response Letter
+    type: agency_response_letter
+    pages: [1, 2]
+    text_layer: native
+    signed_by:
+      name: Lauren Picone
+      title: General Counsel, Massachusetts Department of Transitional Assistance
+    signed_date: 2026-02-13
+    notes: |
+      Two-page response letter on DTA letterhead (Healey/Driscoll/Mahaniah/Cole
+      mast). Quotes the outbound PRR scope verbatim and lists four numbered
+      record categories. References DTA's Online Guide as additionally
+      responsive. Closes the PRR. Includes appeal pathway under
+      M.G.L. c. 66, § 10A and a non-waiver-of-privilege reservation clause.
+
+  - id: doc02_tr_order_form
+    title: Thomson Reuters Order Form Q-08237974
+    type: procurement_order_form
+    pages: [3, 4, 5, 6]
+    text_layer: scanned_image      # required OCR
+    order_id: Q-08237974
+    customer_account_id: "1000355212"
+    customer:
+      name: MA Transitional Assistance Dept
+      address_line1: 600 Washington St
+      city: Boston
+      state: MA
+      zip: "02111-1704"
+    signed_by_customer:
+      name: Rachel Goldstein
+      title: Chief Financial Officer
+      organization: Massachusetts Department of Transitional Assistance
+    signed_date: 2024-04-22
+    expires: 2024-05-13
+    vendor_rep:
+      name: Katie Denberg
+      email: katie.denberg@thomsonreuters.com
+    products:
+      - material_id: "41308780"
+        name: CLEAR ProFlex
+        monthly_charge_usd: 3424.17
+        minimum_term_months: 36
+      - material_id: "41859364"
+        name: CLEAR Government Investigations Advanced
+      - material_id: "42028395"
+        name: BATCH PERSON SEARCH 4800 ANNUAL INPUTS
+    account_contact:
+      name: Joseph Camara
+      email: joseph.camara@mass.gov
+      role: CLEAR Primary Contact / Email/Password Contact
+
+  - id: doc03_west_publishing_sow
+    title: West Publishing Corporation Statement of Work for ID Risk Analytics
+    type: statement_of_work
+    pages: [7, 8, 9, 10, 11, 12]
+    text_layer: scanned_image      # required OCR
+    customer: Massachusetts Department of Transitional Assistance
+    vendor: West Publishing Corporation (a Thomson Reuters business)
+    signed_by_customer:
+      name: Rachel Goldstein
+      title: Chief Financial Officer
+      organization: Massachusetts Department of Transitional Assistance
+    signed_by_vendor:
+      name: Julie Thomas
+      title: Dir Comm Strategy & Policy
+      organization: West Publishing Corporation
+    project_manager_vendor:
+      name: Anand Janakiraman
+      title: Senior Project Manager
+      email: anand.janakiraman@thomsonreuters.com
+    scope_one_liner: |
+      Delivery of West Publishing's ID Risk Analytics (IDRA) Software-as-a-
+      Service to MA DTA, deployed in Microsoft Azure for up to 30 users, used
+      for identity-risk analysis of SNAP recipient population.
+    deliverables:
+      - Data Files Specification Document (DFSD)
+      - One-time batch ID Risk Analytics for current SNAP population (~1.02M)
+        plus SIU Briefing Report with supporting identity-risk details
+      - Master Design Document (MDD) from Project Requirements and Onboarding
+        Process (PROP) sessions
+      - Training (one remote session per 20 users, up to 4 sessions)
+    pricing_year1_usd:
+      idra_subscription_30_users_and_clear_id_confirm_500k_per_year: 214980
+      one_time_batch_1_02m_recipients_with_siu_report: 112200
+      total: 327180
+      annual_increase_y2_y3_pct: 5
+    user_seats: 30
+    one_time_batch_population: 1020000
+    ongoing_match_limit_per_year: 500000
+    risk_alerts_configured: "up to 30"
+    hosting: Microsoft Azure
+    backup_security_retention: |
+      AES-256 storage-area-network encryption at rest; nightly encrypted
+      backups via Azure Recovery Services Vault. Customer-supplied retention
+      policy; if absent, 30 days post-termination data destruction.
+    help_desk:
+      phone_hours: "Mon-Fri 8:00 am - 5:00 pm Eastern, excl. federal holidays"
+      electronic_ticketing: "24/7"
+      severity_response_times:
+        high: 4 hours
+        medium: 1 business day
+        low: 2 business days
+    timeline_milestones:
+      project_initiation_offset_days: 0
+      prop_sessions_offset_days: 7
+      receive_source_data_offset_days: 30
+      go_live_standard_snap_idra_nightly_batch_post_data_days: 30
+      one_time_batch_results_post_data_days: 45
+      mdd_after_prop_and_validated_data_days: 15
+      idra_go_live_after_mdd_or_validated_data_days: 180
+    referenced_third_parties:
+      - Pondera Solutions (security incident reporting at
+        ISO@PonderaSolutions.com)
+
+  - id: doc04_dta_online_guide
+    title: DTA Online Guide
+    type: referenced_but_not_attached
+    pages: []
+    notes: |
+      Page 1 of the response says: "Documents responsive to your request are
+      attached hereto, and also responsive is DTA's Online Guide." The Online
+      Guide itself is not included as a PDF attachment; it lives on
+      mass.gov and was referenced in lieu of attachment. Flagged for Phase 1c
+      deep-research follow-up to capture the canonical URL.

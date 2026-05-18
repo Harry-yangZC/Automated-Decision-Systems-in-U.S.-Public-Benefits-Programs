@@ -1,0 +1,14 @@
+id: risk_alerts_thresholds_dashboards
+title: Risk alerts, configured thresholds, and dashboards
+request_text: |
+  Configured risk alerts and their detection logic — including
+  shared-address, shared-IP, shared-email, deceased-recipient, and similar
+  anomaly checks — together with dashboard metric specifications,
+  thresholds, scoring categories, and aggregate dashboards displaying
+  {{program}} applicant or recipient risk distributions.
+parametrized_slots:
+  - program
+applicable_programs: []
+required_state_features: []
+seeded_from:
+  - doc03_west_publishing_sow

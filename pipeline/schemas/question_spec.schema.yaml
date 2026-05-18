@@ -1,0 +1,141 @@
+# JSON Schema for entries in pipeline/questions/question_spec.yaml.
+# Source of truth for V2 §6.1 (Phase 2 question set design).
+#
+# The hand-authored question_spec.yaml is a list[QuestionSpecEntry]; this
+# schema is the structural contract every entry must satisfy.
+
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "https://benefits-decoded.brown.edu/schemas/question_spec.schema.yaml"
+title: question_spec_entry
+description: |
+  One hand-authored entry in pipeline/questions/question_spec.yaml. The list
+  collectively covers every web-extractable field in the populated playbook
+  (state_law and agency_program), plus production-document-grounded vendor
+  facts flagged as manual_production_doc. See pipeline/workflow_design_V2.md
+  §6.1 for design rationale; the actual entries live in
+  pipeline/questions/question_spec.yaml.
+
+type: object
+required:
+  - field_path
+  - question_template
+  - answer_format
+  - max_length
+  - source_pattern
+  - certification_threshold
+  - example_good
+  - example_bad
+  - extraction_mode
+additionalProperties: false
+
+properties:
+  field_path:
+    type: string
+    description: |
+      Dotted path into the joined (state_law, agency_program) playbook.
+      Supports list-index syntax `foo.bar[N]` for arrays such as
+      `agency_program.benefits_tech_systems[0].vendor_name`. Must resolve
+      to a non-null leaf in the populated playbook (enforced by the
+      reverse-closure audit in validate_question_spec.py).
+    pattern: "^(state_law|agency_program)(\\.[A-Za-z_][A-Za-z0-9_]*(\\[[0-9]+\\])?)+$"
+
+  question_template:
+    type: string
+    description: |
+      Natural-language question used to prompt the Phase 3 extractor. May
+      contain `{state}` and `{program}` placeholders; the derivation script
+      substitutes them when emitting the benchmark.
+    minLength: 10
+    maxLength: 400
+
+  answer_format:
+    type: string
+    description: |
+      Per-question-type answer taxonomy. V2 §7.1 defines the canonical 18
+      types; Phase 2 adds two helpers:
+        - `string_list` for list-of-strings fields (program_aliases,
+          submission_methods, branch_carveouts, etc.) that V2 §7.1 did not
+          anticipate. The Phase 3 extractor returns a JSON array; the
+          derivation script joins it with "; " in the benchmark.
+        - `paraphrase` is a sentinel for the excluded-path closure-check
+          audit. It is NOT to appear on any actual question_spec.yaml entry
+          — entries should use one of the 18 V2 types or `string_list`. The
+          validator allows it here only so that EXCLUDED_PATHS may carry
+          this label for documentation.
+    enum:
+      - agency_full_name
+      - agency_abbreviation
+      - officer_name
+      - officer_title
+      - email
+      - phone
+      - street_address
+      - po_box
+      - zip5
+      - zip9
+      - statute_citation
+      - deadline_days
+      - extension_days
+      - boolean
+      - enum
+      - url
+      - multi_field
+      - not_available
+      - string_list
+      - paraphrase
+
+  max_length:
+    type: integer
+    description: |
+      Maximum length in characters of the raw answer string. The Phase 3
+      extraction prompt embeds this verbatim. For `string_list` answers,
+      bounds the joined "; "-separated output.
+    minimum: 1
+    maximum: 4000
+
+  source_pattern:
+    type: string
+    description: |
+      Regex (Python re) the source URL must match for the answer to count
+      toward auto-certification. For manual_production_doc entries set to
+      `".*"` — production-document evidence is not URL-grounded.
+    minLength: 1
+
+  certification_threshold:
+    type: string
+    description: |
+      Per-question strictness, used by Phase 3's tiered gate.
+        - high   : auto-certify only (statute citation, agency name, RAO name)
+        - medium : auto-certify or soft-certify acceptable
+        - low    : even one-signal-passing accepted (alias lists, keyword bags)
+    enum: [high, medium, low]
+
+  example_good:
+    type: string
+    description: |
+      Concrete example of a correctly-formed answer. Embedded into the
+      Phase 3 user prompt (V2 §7.2) as in-context conditioning.
+    minLength: 1
+
+  example_bad:
+    type: string
+    description: |
+      Concrete example of a malformed answer the extractor must NOT produce.
+      Typically a natural-language sentence rather than a typed value.
+    minLength: 1
+
+  extraction_mode:
+    type: string
+    description: |
+      Whether the fact is harvestable from the open web (`web`) or only
+      from a production document already in pipeline/precedents/
+      (`manual_production_doc`). Production-document-only facts are not
+      eligible for Phase 3 web extraction; they remain in the playbook and
+      benchmark but flow through manual review.
+    enum: [web, manual_production_doc]
+
+  notes:
+    type: string
+    description: |
+      Optional free-form provenance, caveats, or cross-references for the
+      RA. Not used by the runner.

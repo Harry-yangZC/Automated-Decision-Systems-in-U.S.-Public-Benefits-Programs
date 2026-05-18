@@ -1,0 +1,242 @@
+# Extracted facts — benefits-tech systems from MA DTA production package
+# Provenance for every fact is the page of pipeline/gold_letters/gold_letter.pdf
+# (production_package_id: MA_DTA_ADS_2026) and the quote string verbatim from
+# that page (OCR-cleaned for pp. 3-12; native text for pp. 1-2).
+# Conforms in spirit to the benefits_tech_systems[] schema in
+# pipeline/workflow_design_V2.md §5.4 / pipeline/schemas/agency_program.schema.json.
+
+production_package_id: MA_DTA_ADS_2026
+received_at: 2026-02-13
+state: MA
+program: SNAP
+
+benefits_tech_systems:
+
+  - vendor_name: Thomson Reuters Enterprise Centre GmbH / West Publishing Corporation
+    product_names:
+      - CLEAR
+      - CLEAR ProFlex
+      - CLEAR Government Investigations Advanced
+      - Batch Person Search (4,800 annual inputs)
+    use_cases:
+      - Data lookup tool for fraud detection and identity verification
+        (general-purpose investigative platform)
+    programs_covered: [SNAP, TAFDC, EAEDC]      # inferred from outbound scope
+    contract_or_order_ids:
+      - "Q-08237974"
+      - "Account #1000355212"
+    pricing_terms: |
+      CLEAR ProFlex monthly charge $3,424.17; minimum term 36 months;
+      automatic 12-month renewal absent 30-day notice.
+    user_seats: null
+    batch_or_match_limits: |
+      Batch Person Search subscription includes 4,800 annual inputs;
+      overages charged at Schedule A rates.
+    required_data_inputs: []
+    named_deliverables: []
+    hosting_security_retention: null
+    contract_signed_at: 2024-04-22
+    contract_expires_at: null
+    customer_signatory:
+      name: Rachel Goldstein
+      title: Chief Financial Officer, MA DTA
+    customer_account_contact:
+      name: Joseph Camara
+      email: joseph.camara@mass.gov
+    vendor_rep:
+      name: Katie Denberg
+      email: katie.denberg@thomsonreuters.com
+    evidence:
+      - field: product_names
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        production_package_id: MA_DTA_ADS_2026
+        document_title: Thomson Reuters Order Form Q-08237974
+        page: 3
+        quote: "ProFlex Products / 41308780 / CLEAR Proflex / $3,424.17 / 36 (Months)"
+        received_at: 2026-02-13
+      - field: pricing_terms
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: Thomson Reuters Order Form Q-08237974, Attachment
+        page: 6
+        quote: "Pricing is displayed only for the years included in the Minimum Term... 41308780 CLEAR Proflex ... $3,424.17"
+        received_at: 2026-02-13
+      - field: batch_or_match_limits
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: Thomson Reuters Order Form Q-08237974, Attachment
+        page: 6
+        quote: "42028395 BATCH PERSON SEARCH 4800 ANNUAL INPUTS"
+        received_at: 2026-02-13
+      - field: customer_account_contact
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: Thomson Reuters Order Form Q-08237974, Attachment
+        page: 6
+        quote: "JOSEPH CAMARA joseph.camara@mass.gov CLEAR PRIMARY CONT"
+        received_at: 2026-02-13
+
+  - vendor_name: West Publishing Corporation (a Thomson Reuters business)
+    product_names:
+      - ID Risk Analytics (IDRA)
+      - CLEAR ID Confirm
+    use_cases:
+      - Identity-risk analytics over SNAP recipient population (heads of
+        household) for fraud/identity-verification flagging
+      - Aggregate risk dashboards displaying applicants binned high/medium/low
+        risk
+      - Configured anomaly alerts (e.g., shared home address, IP address,
+        email address, deceased recipients)
+    programs_covered: [SNAP]
+    contract_or_order_ids:
+      - "West Publishing SOW for IDRA (companion to Order Q-08237974)"
+    pricing_terms: |
+      Year 1 total $327,180:
+        - IDRA Subscription (up to 30 users, incl. CLEAR ID Confirm for up to
+          500,000 program participants/year): $214,980
+        - One-time batch of ID Risk Analytics for current existing population
+          (Est. 1.02M recipients) with SIU Briefing Report & Supporting
+          Identity Risk Details: $112,200
+      Years 2 and 3 annual subscription increases 5% year over year.
+      Additional recipients above the threshold: $0.20/recipient.
+    user_seats: 30
+    batch_or_match_limits: |
+      One-time batch of CIDC data: up to 1,020,000 recipients (then current
+      SNAP population). Ongoing Recipient Validation: up to 500,000 matches
+      per year. Risk Alerts: up to 30 configured alerts. IDRA users can
+      download detailed risk-alert data with no limit.
+    required_data_inputs:
+      - One year of program data relating to applicants, recipients, and
+        households (delivered within 30 days of contract start)
+      - Reference descriptions for all reference codes in the data
+      - Data dictionaries for all the data delivered to TR
+      - Diagram of the relational model (primary/foreign key relations among
+        source tables)
+    named_deliverables:
+      - Data Files Specification Document (DFSD) — describes entities, recipients,
+        program data required, format detail, and methodology for use in the System
+      - One-time batch ID Risk Analytics output for current existing SNAP
+        population, plus a Summary Briefing Report (Special Investigations
+        Unit) with supporting identity-risk details and a review session
+      - Master Design Document (MDD) — output of the Project Requirements and
+        Onboarding Process (PROP); structured technical/business fit-gap
+        interviews used to configure dashboard components, thresholds, and
+        identify data sources; must be formally accepted before configuration
+        work begins
+      - Training — one remote session per 20 users, up to 4 remote sessions;
+        screen-specific customized user manuals; on-request training for
+        major updates or substantive new functionality; embedded help and FAQs
+      - Online User Manual for the System
+    hosting_security_retention: |
+      Hosting: Microsoft Azure platform and data centers, with industry-
+      standard security protocols and ciphers. Connectivity via secure VPN
+      from Customer's network. Backup: nightly encrypted file- and database-
+      level backups via Azure Recovery Services Vault; AES-256 storage area
+      network (SAN) at rest. Customer-defined data retention policy (provided
+      within 45 days of contract start); default if absent is 30 days post-
+      termination destruction. Security incident reporting to
+      ISO@PonderaSolutions.com within 72 hours of unauthorized
+      use/disclosure. Recommends Chromium-based browsers.
+    timeline_milestones:
+      - "Project initiation: contract execution"
+      - "Begin PROP/Requirements Sessions: contract execution + 7 calendar days"
+      - "Receive source program data: contract execution + 30 calendar days"
+      - "Go-Live of standard SNAP IDRA nightly batch: receipt + acceptance of data + 30 days"
+      - "Delivery of one-time batch results with SIU Report: receipt + acceptance of data + 45 days"
+      - "Master Design Document: completion of IDRA PROP sessions + receipt of complete & validated source data (whichever later) + 15 calendar days"
+      - "IDRA Go-Live: fully configured IDRA nightly batch OR real-time IDRA: completion of MDD OR receipt of complete & validated source data (whichever later) + 180 calendar days"
+    help_desk:
+      live_phone_hours: Mon-Fri 8:00 am - 5:00 pm Eastern (excl. federal holidays)
+      electronic_ticketing: 24/7
+      severity_levels:
+        high: 4 hours              # complete loss of service / no workaround
+        medium: 1 business day     # important features impaired but workaround
+        low: 2 business days       # inconvenience / minor deficiency
+    customer_responsibilities_excerpt:
+      - Designate key project stakeholders within 7 calendar days of contract start
+      - Assign technical resource within 7 calendar days of contract start
+      - Maintain industry-standard general IT computer and application controls
+      - Maintain current list of authorized decision-makers
+    customer_signatory:
+      name: Rachel Goldstein
+      title: Chief Financial Officer, MA DTA
+    vendor_signatory:
+      name: Julie Thomas
+      title: Dir Comm Strategy & Policy, West Publishing Corporation
+    vendor_project_manager:
+      name: Anand Janakiraman
+      title: Senior Project Manager
+      email: anand.janakiraman@thomsonreuters.com
+    evidence:
+      - field: product_names
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        production_package_id: MA_DTA_ADS_2026
+        document_title: West Publishing Corporation Statement of Work
+        page: 7
+        quote: "West Publishing Corporation, a Thomson Reuters business ... will deliver to the Massachusetts Department of Transitional Assistance (Customer) its identity risk analytics (ID Risk Analytics or IDRA) solution"
+        received_at: 2026-02-13
+      - field: user_seats
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 7
+        quote: "deployed in Microsoft's Azure environment for up to 30 users"
+        received_at: 2026-02-13
+      - field: programs_covered
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 9
+        quote: "TR will run current heads of household through ID Risk Analytics to identify areas of risk"
+        received_at: 2026-02-13
+      - field: batch_or_match_limits
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 10
+        quote: "IDRA Subscription - Up to 30 Users, including CLEAR ID Confirm for up to 500,000 program participants per year"
+        received_at: 2026-02-13
+      - field: pricing_terms
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 10
+        quote: "Year 1 Total $327,180 ... The annual subscription for Years 2 and 3 will increase by 5% year over year. ... Additional recipients above the threshold will be charged at $.20/recipient."
+        received_at: 2026-02-13
+      - field: required_data_inputs
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 11
+        quote: "Within thirty (30) days of contract start, Customer will provide TR with one (1) year of program data relating to applicants, recipients, and households ... Customer will provide reference descriptions for all reference codes in the data and data dictionaries for all the data delivered to TR. ... Customer will provide a diagram of the relational model"
+        received_at: 2026-02-13
+      - field: hosting_security_retention
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 12
+        quote: "Within forty-five (45) days of contract start, Customer will provide TR with its data retention policy. If TR does not receive Customer's retention policy as stated, TR will retain Customer data for the duration of an active subscription and will destroy it within 30 days of subscription termination."
+        received_at: 2026-02-13
+      - field: hosting_security_retention
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 9
+        quote: "The storage system housing backup snapshots is an AES 256-bit Storage Access Network (SAN) storage device encrypted at rest"
+        received_at: 2026-02-13
+      - field: help_desk
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 8
+        quote: "An urgent issue that impacts all Customer users ... High Four (4) hours ... Medium One (1) business day ... Low Two (2) business days"
+        received_at: 2026-02-13
+      - field: timeline_milestones
+        source_type: production_doc
+        source_ref: gold_letter.pdf
+        document_title: West Publishing Corporation Statement of Work
+        page: 10
+        quote: "Project Initiation: Contract execution ... Receive Source Program Data: Contract execution + 30 calendar days ... IDRA Go-Live: ... + 180 calendar days"
+        received_at: 2026-02-13

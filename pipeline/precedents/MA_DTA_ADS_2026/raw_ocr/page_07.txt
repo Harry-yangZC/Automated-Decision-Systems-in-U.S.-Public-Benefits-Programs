@@ -1,0 +1,60 @@
+support ticket and sends an acknowledgement email. Once a ticket is created, additional
+into Customer support portal. Submitting a support request via email automatically creates a
+2) All authorized users can submit support requests via email, phone, or by directly logging them
+hours in the next business day.
+respond to the support tickets submitted through Customer support portal during non-business
+a day, 7 days a week, 365 days a year except for scheduled maintenance windows. TR will
+excluding federal holidays. Access to the TR electronic ticketing system is available 24 hours
+1) Live phone support is available Monday through Friday from 8:00 am to 5:00 pm Eastern Time,
+System:
+C. Help Desk. Throughout the term of this SOW, TR will provide the following Help Desk support for the
+of contextual help and FAQs.
+directly in the System dashboards. User help also is available within the application in the form
+3) TR will provide an online User Manual for the System and/or field-specific user help embedded
+functionality introduced after the initial System implementation.
+2) Upon request by Customer, TR will provide training for major updates or any new substantive
+manuals.
+system configured for this specific implementation, including customized, screen-specific user
+two to four hours of stakeholder/user participation. TR will provide this training on the UAT
+Unless otherwise requested by Customer, and each IDRA training session typically requires
+1) TR will conduct one (1) remote training session per 20 users, up to four (4) remote sessions.
+B. Training
+alerts into an Excel document for sorting, searching, and filtering.
+Reporting
+IDRA users can download detailed data relating to each of the risk No limit
+data dashboard.
+identity fraud schemes. Aggregate results will be displayed on the
+actionable ID fraud leads and operational improvements to prevent
+Risk Alerts
+TR will configure and deploy alerts to check for anomalies to provide Up to 30 alerts
+CIDC data
+1,020,000 for
+population, up to
+anomalies.
+batch of current
+address,
+email address), deceased recipients, and other and one-time
+Validation
+identify areas of risk such as shared values (e.g., home address, IP matches per year
+Recipient
+TR will run current heads of household through ID Risk Analytics to Up to 500,000
+by risk category and total associated benefit dollars.
+results from analytic runs with weekly/year-to-date/lifetime statistics
+risk of identity or other types of fraud. Example metrics include
+and time series visualizations of applicants at high, medium, and low
+Data Dashboard
+TR will provide an executive dashboard that displays aggregate data 1 data dashboard
+Functionality
+Description
+Quantity
+quantities or limitations will be delivered as follows:
+Microsoft's Azure environment for up to 30 users. The specific IDRA functionality and applicable
+A. ID Risk Analytics. TR will deliver IDRA as a Software-as-a-Service subscription deployed in
+1. SCOPE OF SERVICES
+particularly described in this SOW.
+Analytics or IDRA) solution (the "System") together with related implementation services, all as more
+Massachusetts Department of Transitional Assistance (Customer) its identity risk analytics (ID Risk
+West Publishing Corporation, a Thomson Reuters business (Thomson Reuters or TR) will deliver to the
+WEST PUBLISHING CORPORATION STATEMENT OF WORK
+Page 1 of 6
+THOMSON REUTERS®

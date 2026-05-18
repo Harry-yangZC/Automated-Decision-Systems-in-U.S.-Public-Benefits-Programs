@@ -1,0 +1,371 @@
+{
+  "state": "MA",
+  "program": "SNAP",
+  "program_aliases": [
+    "Supplemental Nutrition Assistance Program",
+    "SNAP",
+    "food stamps",
+    "food assistance"
+  ],
+  "administering_agency": {
+    "name": "Massachusetts Department of Transitional Assistance",
+    "abbreviation": "DTA"
+  },
+  "sub_agency": null,
+  "records_officer": {
+    "name": "Lauren Picone",
+    "title": "Records Access Officer",
+    "org_title": "Deputy General Counsel"
+  },
+  "contact": {
+    "email": "DTA.RAO@state.ma.us",
+    "phone": "6173485247",
+    "address_line1": "One Ashburton Place",
+    "address_line2": null,
+    "city": "Boston",
+    "state": "MA",
+    "zip": "02108"
+  },
+  "portal": {
+    "name": "DTA Public Records Request Form",
+    "url": "https://www.mass.gov/forms/submit-a-department-of-transitional-assistance-dta-public-records-request-prr",
+    "required_fields": [
+      "description_or_summary_of_request",
+      "first_and_last_name",
+      "name_of_organization",
+      "requestor_email"
+    ]
+  },
+  "submission_methods": ["email", "mail", "portal", "fax", "in_person"],
+  "known_system_names": ["BEACON", "EPPIC", "DTA Connect"],
+  "known_vendors": ["Fidelity Information Services (FIS)", "Conduent"],
+  "benefits_tech_systems": [
+    {
+      "vendor_name": "Thomson Reuters Enterprise Centre GmbH / West Publishing Corporation",
+      "product_names": [
+        "CLEAR",
+        "CLEAR ProFlex",
+        "CLEAR Government Investigations Advanced",
+        "Batch Person Search (4,800 annual inputs)"
+      ],
+      "use_cases": [
+        "Data lookup tool for fraud detection and identity verification (general-purpose investigative platform)"
+      ],
+      "programs_covered": ["SNAP", "TAFDC", "EAEDC"],
+      "contract_or_order_ids": ["Q-08237974", "Account #1000355212"],
+      "pricing_terms": "CLEAR ProFlex monthly charge $3,424.17; minimum term 36 months; automatic 12-month renewal absent 30-day notice.",
+      "user_seats": null,
+      "batch_or_match_limits": "Batch Person Search subscription includes 4,800 annual inputs; overages charged at Schedule A rates.",
+      "required_data_inputs": [],
+      "named_deliverables": [],
+      "hosting_security_retention": null,
+      "evidence": [
+        {
+          "field": "product_names",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "Thomson Reuters Order Form Q-08237974",
+          "page": 3,
+          "quote": "ProFlex Products / 41308780 / CLEAR Proflex / $3,424.17 / 36 (Months)",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "pricing_terms",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "Thomson Reuters Order Form Q-08237974, Attachment",
+          "page": 6,
+          "quote": "41308780 CLEAR Proflex ... $3,424.17",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "batch_or_match_limits",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "Thomson Reuters Order Form Q-08237974, Attachment",
+          "page": 6,
+          "quote": "42028395 BATCH PERSON SEARCH 4800 ANNUAL INPUTS",
+          "received_at": "2026-02-13"
+        }
+      ]
+    },
+    {
+      "vendor_name": "West Publishing Corporation (a Thomson Reuters business)",
+      "product_names": ["ID Risk Analytics (IDRA)", "CLEAR ID Confirm"],
+      "use_cases": [
+        "Identity-risk analytics over SNAP recipient population (heads of household) for fraud/identity-verification flagging",
+        "Aggregate risk dashboards displaying applicants binned high/medium/low risk",
+        "Configured anomaly alerts (shared home address, IP address, email address, deceased recipients)"
+      ],
+      "programs_covered": ["SNAP"],
+      "contract_or_order_ids": ["West Publishing SOW for IDRA (companion to Order Q-08237974)"],
+      "pricing_terms": "Year 1 total $327,180: IDRA Subscription (up to 30 users, incl. CLEAR ID Confirm for up to 500,000 program participants/year) $214,980; one-time batch of ID Risk Analytics for current population (~1.02M recipients) with SIU Briefing Report and supporting identity-risk details $112,200. Years 2 and 3 annual subscription increases 5% year over year. Additional recipients above the threshold: $0.20/recipient.",
+      "user_seats": 30,
+      "batch_or_match_limits": "One-time batch of CIDC data: up to 1,020,000 recipients (then-current SNAP population). Ongoing Recipient Validation: up to 500,000 matches per year. Risk Alerts: up to 30 configured alerts.",
+      "required_data_inputs": [
+        "One year of program data relating to applicants, recipients, and households (delivered within 30 days of contract start)",
+        "Reference descriptions for all reference codes in the data",
+        "Data dictionaries for all the data delivered to TR",
+        "Diagram of the relational model (primary/foreign key relations among source tables)"
+      ],
+      "named_deliverables": [
+        "Data Files Specification Document (DFSD)",
+        "One-time batch ID Risk Analytics output for current existing SNAP population, plus a Summary Briefing Report (Special Investigations Unit) with supporting identity-risk details and a review session",
+        "Master Design Document (MDD) from Project Requirements and Onboarding Process (PROP) sessions",
+        "Training (one remote session per 20 users, up to 4 remote sessions; screen-specific customized user manuals)",
+        "Online User Manual for the System"
+      ],
+      "hosting_security_retention": "Hosting: Microsoft Azure platform and data centers, with industry-standard security protocols and ciphers. Connectivity via secure VPN from Customer's network. Backup: nightly encrypted file- and database-level backups via Azure Recovery Services Vault; AES-256 storage area network (SAN) at rest. Customer-defined data retention policy (provided within 45 days of contract start); default if absent is 30 days post-termination destruction. Security incident reporting to ISO@PonderaSolutions.com within 72 hours of unauthorized use/disclosure.",
+      "evidence": [
+        {
+          "field": "product_names",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 7,
+          "quote": "West Publishing Corporation, a Thomson Reuters business ... will deliver to the Massachusetts Department of Transitional Assistance (Customer) its identity risk analytics (ID Risk Analytics or IDRA) solution",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "user_seats",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 7,
+          "quote": "deployed in Microsoft's Azure environment for up to 30 users",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "programs_covered",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 9,
+          "quote": "TR will run current heads of household through ID Risk Analytics to identify areas of risk",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "batch_or_match_limits",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 10,
+          "quote": "IDRA Subscription - Up to 30 Users, including CLEAR ID Confirm for up to 500,000 program participants per year",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "pricing_terms",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 10,
+          "quote": "Year 1 Total $327,180 ... The annual subscription for Years 2 and 3 will increase by 5% year over year. ... Additional recipients above the threshold will be charged at $.20/recipient.",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "required_data_inputs",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 11,
+          "quote": "Within thirty (30) days of contract start, Customer will provide TR with one (1) year of program data relating to applicants, recipients, and households ... Customer will provide reference descriptions for all reference codes in the data and data dictionaries for all the data delivered to TR. ... Customer will provide a diagram of the relational model",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "hosting_security_retention",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 9,
+          "quote": "The storage system housing backup snapshots is an AES 256-bit Storage Access Network (SAN) storage device encrypted at rest",
+          "received_at": "2026-02-13"
+        },
+        {
+          "field": "hosting_security_retention",
+          "source_type": "production_doc",
+          "source_ref": "gold_letter.pdf",
+          "production_package_id": "MA_DTA_ADS_2026",
+          "document_title": "West Publishing Corporation Statement of Work",
+          "page": 12,
+          "quote": "Within forty-five (45) days of contract start, Customer will provide TR with its data retention policy. If TR does not receive Customer's retention policy as stated, TR will retain Customer data for the duration of an active subscription and will destroy it within 30 days of subscription termination.",
+          "received_at": "2026-02-13"
+        }
+      ]
+    }
+  ],
+  "keywords": [
+    "automated decision systems",
+    "algorithms",
+    "data-matching",
+    "artificial intelligence",
+    "machine learning",
+    "predictive analytics",
+    "fraud detection",
+    "identity verification",
+    "eligibility determination",
+    "BEACON",
+    "EPPIC",
+    "DTA Connect",
+    "CLEAR",
+    "IDRA",
+    "ID Risk Analytics",
+    "Thomson Reuters",
+    "West Publishing"
+  ],
+  "evidence": [
+    {
+      "field": "administering_agency.name",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/how-to/supplemental-nutrition-assistance-program-snap-formerly-known-as-food-stamps",
+      "quote": "SNAP is a federal nutrition program administered by the Department of Transitional Assistance (DTA) for Massachusetts residents.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "administering_agency.name",
+      "source_type": "production_doc",
+      "source_ref": "gold_letter.pdf",
+      "production_package_id": "MA_DTA_ADS_2026",
+      "document_title": "DTA Response Letter",
+      "page": 1,
+      "quote": "Commonwealth of Massachusetts / Executive Office of Health and Human Services / Department of Transitional Assistance",
+      "received_at": "2026-02-13"
+    },
+    {
+      "field": "sub_agency",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/orgs/department-of-transitional-assistance",
+      "quote": "Two independent deep-research passes returned NOT FOUND for any separately-named sub-agency responsible for SNAP eligibility within DTA. SNAP eligibility appears to sit inside DTA without a separately-named division.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "records_officer.name",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/dta-public-records",
+      "quote": "The Primary Records Access Officer for the Department of Transitional Assistance is: Lauren Picone, Primary RAO Title: DTA Deputy General Counsel...",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "records_officer.name",
+      "source_type": "production_doc",
+      "source_ref": "gold_letter.pdf",
+      "production_package_id": "MA_DTA_ADS_2026",
+      "document_title": "DTA Response Letter signature block",
+      "page": 2,
+      "quote": "Sincerely, / Enclosure / Lauren Picone / General Counsel",
+      "received_at": "2026-02-13"
+    },
+    {
+      "field": "records_officer.title",
+      "source_type": "url",
+      "source_ref": "https://www.sec.state.ma.us/divisions/public-records/public-records-law/public-records-request.htm",
+      "quote": "The Law requires every agency and municipality to designate a Records Access Officer (RAO), who assists requesters in obtaining public records.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "records_officer.org_title",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/dta-public-records",
+      "quote": "Title: DTA Deputy General Counsel",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "contact.email",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/dta-public-records",
+      "quote": "Business email: DTA.RAO@state.ma.us. Only questions pertaining to the PRR process or a PRR status should be sent to the email account of the Primary RAO...",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "contact.phone",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/dta-public-records",
+      "quote": "Business telephone number: 617-348-5247",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "contact.address_line1",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/dta-public-records",
+      "quote": "Business address: 1 Ashburton Place, Boston, MA 02108",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "contact.address_line1",
+      "source_type": "production_doc",
+      "source_ref": "gold_letter.pdf",
+      "production_package_id": "MA_DTA_ADS_2026",
+      "document_title": "DTA Response Letter letterhead",
+      "page": 1,
+      "quote": "One Ashburton Place, Boston, MA 02108",
+      "received_at": "2026-02-13"
+    },
+    {
+      "field": "portal.url",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/forms/submit-a-department-of-transitional-assistance-dta-public-records-request-prr",
+      "quote": "Briefly describe and summarize the public records request:(Required). Use this section to provide details/specifics of your public records request.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "portal.required_fields",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/forms/submit-a-department-of-transitional-assistance-dta-public-records-request-prr",
+      "quote": "Please enter your first and last name. Name of Organization(Required). List the name of your business/organization here. Requestor Email Address(Required).",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "submission_methods",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/dta-public-records",
+      "quote": "You can also submit a written request by mail, email, fax, or by hand. Please note that while requests for public records may be made orally in person to a custodian...",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "program_aliases",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/orgs/department-of-transitional-assistance",
+      "quote": "DTA serves one in six residents of the Commonwealth with direct economic assistance (cash benefits) and food assistance (SNAP benefits)...",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "known_system_names",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/info-details/audit-of-the-department-of-transitional-assistance-overview-of-audited-entity",
+      "quote": "The Benefit Eligibility and Control Online Network (BEACON) system is the primary information system that DTA uses to administer benefits for...",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "known_system_names",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/info-details/department-of-transitional-assistance-finding-3",
+      "quote": "The BEACON system determines and tracks eligibility requirements, then interfaces with the EPPIC system to distribute benefits to eligible...",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "known_system_names",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/news/the-department-of-transitional-assistance-launched-the-dta-connect-website",
+      "quote": "DTA has launched dtaconnect.com, a website providing clients with fast, interactive access to case information.",
+      "retrieved_at": "2026-05-18"
+    },
+    {
+      "field": "known_vendors",
+      "source_type": "url",
+      "source_ref": "https://www.mass.gov/news/dta-transitions-to-new-third-party-ebt-vendor",
+      "quote": "DTA has signed a contract with Fidelity Information Services (FIS) to be Massachusetts' new EBT vendor.",
+      "retrieved_at": "2026-05-18"
+    }
+  ],
+  "confidence": "high",
+  "needs_manual_review": false
+}

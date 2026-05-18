@@ -1,0 +1,43 @@
+required by this SOW. The Statement of Work Managers are:
+The Statement of Work Managers are responsible for deliverable sign-off and other approvals as
+4. STATEMENT OF WORK MANAGERS
+Section 1.
+The subscription fee includes the configuration in the quantities for the base System described in
+The annual subscription for Years 2 and 3 will increase by 5% year over year.
+* Additional recipients above the threshold will be charged at $.20/recipient.
+Year 1 Total
+$327,180
+Recipients) with SIU Briefing Report & Supporting Identity Risk Details
+One-Time Batch of ID Risk Analytics for Current Existing Population (Est. 1.02M
+$112,200
+program participants per year*
+$214,980
+IDRA Subscription - Up to 30 Users, including CLEAR ID Confirm for up to 500,000
+Description
+Year 1 Price
+configuration of the customized for MA DTA nightly batch IDRA OR Real-time IDRA, per client decision.
+execution. This includes the initial go-live for nightly batch standard SNAP IDRA and the continued
+subscription for IDRA. This subscription shall be payable monthly in arrears starting at contract
+$327,180 and includes the one-time batch of the current existing population and the first-year
+This SOW includes a 12-month subscription of the System (IDRA). The Year 1 price of the solution is
+3. COMPENSATION AND PAYMENT TERMS
+calendar days
+IDRA Go-Live:
+Validated Source Data (whichever is later) + 180
+Fully Configured IDRA nightly batch or Real-Time Completion of MDD or Receipt of Complete and
+later) + 15 calendar days
+Master Design Document:
+Complete and Validated Source Data (whichever is
+Final IDRA (configured for MA SNAP) Completion of IDRA PROP sessions + Receipt of
+population IDRA data with SIU report
+Delivery of one-time batch results for existing
+Receipt and acceptance of data + 45 days
+nightly batch
+Go-Live of STANDARD SNAP IDRA with Receipt and acceptance of data + 30 days
+Receive Source Program Data Contract execution + 30 calendar days
+Begin PROP/Requirements Sessions: Contract execution + 7 calendar days
+Project Initiation: Contract execution
+Milestone/Deliverable
+Timeframe
+Page 4 of 6
+THOMSON REUTERS®

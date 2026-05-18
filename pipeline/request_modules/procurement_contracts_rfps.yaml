@@ -1,0 +1,14 @@
+id: procurement_contracts_rfps
+title: Procurement contracts, order forms, RFPs, and renewals
+request_text: |
+  Procurement contracts, order forms, statements of work, requests for
+  proposals (RFPs), responses to RFPs, amendments, renewals, pricing
+  schedules, subscription terms, and procurement correspondence for
+  third-party software used for fraud detection, identity verification,
+  or eligibility determination in {{program}}.
+parametrized_slots:
+  - program
+applicable_programs: []
+required_state_features: []
+seeded_from:
+  - doc02_tr_order_form

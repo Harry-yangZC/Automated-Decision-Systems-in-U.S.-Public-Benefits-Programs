@@ -1,0 +1,12 @@
+id: system_documentation
+title: System and product documentation
+request_text: |
+  Internally developed or vendor-provided technical documentation,
+  system architecture descriptions, product attachments, configuration
+  materials, online user manuals, and any embedded help or FAQ content
+  describing the operation of these systems.
+parametrized_slots: []
+applicable_programs: []
+required_state_features: []
+seeded_from:
+  - doc03_west_publishing_sow

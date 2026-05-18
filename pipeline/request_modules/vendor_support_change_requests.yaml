@@ -1,0 +1,12 @@
+id: vendor_support_change_requests
+title: Vendor support, customer-success, and change requests
+request_text: |
+  Help-desk severity-level terms, support tickets and escalations,
+  customer-success engagement records, quarterly account-review materials,
+  feature requests, new-data-source requests, and change orders associated
+  with these systems.
+parametrized_slots: []
+applicable_programs: []
+required_state_features: []
+seeded_from:
+  - doc03_west_publishing_sow

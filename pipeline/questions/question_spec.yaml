@@ -1,0 +1,499 @@
+# Phase 2 question set for the MA × SNAP vertical-slice pilot.
+#
+# Hand-authored per V2 §6.1; one entry per web-extractable field in the
+# populated playbook (state_law.MA + agency_program.MA_SNAP), plus the
+# production-document-grounded vendor facts flagged as
+# manual_production_doc. The benchmark
+# pipeline/benchmarks/MA_SNAP_benchmark.csv is auto-derived from this file
+# and the playbooks; do not edit the benchmark by hand.
+#
+# Schema: pipeline/schemas/question_spec.schema.yaml.
+# Closure: pipeline/questions/validate_question_spec.py.
+
+# ============================================================
+# Layer A — state_law.public_records_law.* (22 entries)
+# ============================================================
+
+- field_path: state_law.public_records_law.name
+  question_template: "What is the common name of the public records law in {state}?"
+  answer_format: agency_full_name
+  max_length: 80
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: medium
+  example_good: "Massachusetts Public Records Law"
+  example_bad: "The law that governs public records requests in Massachusetts is..."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.citation
+  question_template: "What is the statutory citation for the public records law in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 66, § 10"
+  example_bad: "Massachusetts has a public records law that allows citizens to..."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.response_deadline
+  question_template: "How many business or calendar days does an agency in {state} have to respond to a public records request?"
+  answer_format: deadline_days
+  max_length: 25
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "10 business days"
+  example_bad: "10 business days, with a possible 20-day extension"
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.response_deadline_citation
+  question_template: "Which statute subsection holds the response deadline for public records requests in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 66, § 10(a)"
+  example_bad: "The deadline is in Chapter 66."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.extension.agency_initial_days
+  question_template: "By how many business days may an agency in {state} unilaterally extend its initial response window for a public records request?"
+  answer_format: extension_days
+  max_length: 25
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "15 business days"
+  example_bad: "An agency may take longer than 10 days if needed."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.extension.agency_initial_citation
+  question_template: "Which statute subsection authorizes an agency-initial extension of the response deadline in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 66, § 10(b)(vi)"
+  example_bad: "It is found in the same section as the response deadline."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.extension.supervisor_extension_days
+  question_template: "After the agency-initial window in {state}, by how many additional business days may the Supervisor of Records extend an agency's response deadline on a showing of good cause?"
+  answer_format: extension_days
+  max_length: 25
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "20 business days"
+  example_bad: "Up to 20 additional business days"
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.extension.supervisor_extension_citation
+  question_template: "Which statute citation authorizes the Supervisor of Records to grant an extension beyond the agency-initial window in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 66, § 10"
+  example_bad: "The same chapter that covers the response deadline."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.appeal_path.venue
+  question_template: "If a public records request is denied in {state}, to which administrative office does a requester file the first-stage appeal?"
+  answer_format: agency_full_name
+  max_length: 120
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "Supervisor of Public Records, Office of the Secretary of the Commonwealth"
+  example_bad: "You can appeal to the state's public records office."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.appeal_path.citation
+  question_template: "Which statute citation governs administrative appeals of denied public records requests in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 66, § 10A"
+  example_bad: "Massachusetts General Laws chapter 66"
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.appeal_path.deadline_days
+  question_template: "Within how many days of the agency's response must a requester in {state} file an administrative appeal with the Supervisor of Records?"
+  answer_format: deadline_days
+  max_length: 25
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "90 calendar days"
+  example_bad: "About three months"
+  extraction_mode: web
+  notes: "Derive script composes 'N <deadline_unit> days' from sibling deadline_unit."
+
+- field_path: state_law.public_records_law.appeal_path.judicial_venue
+  question_template: "Which court hears civil actions for judicial review of denied state-agency public records requests in {state}?"
+  answer_format: agency_full_name
+  max_length: 120
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "Superior Court (Suffolk Superior Court for state agencies)"
+  example_bad: "You can also sue in court."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.appeal_path.judicial_citation
+  question_template: "Which statute citation authorizes judicial review of denied public records requests in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 66, § 10A(c)"
+  example_bad: "Chapter 66, somewhere in section 10A."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.record_definition_citation
+  question_template: "Which statute citation defines the term 'public record' in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 4, § 7, cl. 26"
+  example_bad: "It is defined in the Public Records Law itself."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.fee_waiver.available
+  question_template: "Does the public records law in {state} authorize a fee waiver?"
+  answer_format: boolean
+  max_length: 3
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "yes"
+  example_bad: "Yes, in some cases the RAO may waive fees."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.fee_waiver.statutory_citation
+  question_template: "Which statute citation authorizes fee waivers under the public records law in {state}?"
+  answer_format: statute_citation
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "M.G.L. c. 66, § 10(d)(v)"
+  example_bad: "The same section that covers fees."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.fee_waiver.qualifying_categories
+  question_template: "What categories of requester or use case qualify for a fee waiver under the public records law in {state}?"
+  answer_format: string_list
+  max_length: 400
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: medium
+  example_good: "public_interest_and_not_primarily_commercial; lacks_financial_ability_to_pay"
+  example_bad: "Various public-interest categories may qualify."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.expedited_processing.available
+  question_template: "Does the public records law in {state} provide a separate expedited-processing track?"
+  answer_format: boolean
+  max_length: 3
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "no"
+  example_bad: "Massachusetts does not have a separate expedited-processing track."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.certification_required
+  question_template: "Does the public records law in {state} require a requester to certify or swear an oath in their request?"
+  answer_format: boolean
+  max_length: 3
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "no"
+  example_bad: "No certification or oath is required by the statute."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.residency_restriction
+  question_template: "Does the public records law in {state} restrict requests to in-state residents?"
+  answer_format: boolean
+  max_length: 3
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: high
+  example_good: "no"
+  example_bad: "Anyone may request records from an RAO."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.oral_requests_allowed
+  question_template: "Does the public records law in {state} permit oral (in-person or phone) requests for public records?"
+  answer_format: boolean
+  max_length: 3
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: medium
+  example_good: "yes"
+  example_bad: "Yes, but only a written request lets you appeal."
+  extraction_mode: web
+
+- field_path: state_law.public_records_law.branch_carveouts
+  question_template: "Which categories of government entity are explicitly carved out from the public records law in {state}?"
+  answer_format: string_list
+  max_length: 200
+  source_pattern: "^https?://(www\\.)?(malegislature\\.gov|sec\\.state\\.ma\\.us|rcfp\\.org|nfoic\\.org)/"
+  certification_threshold: low
+  example_good: "federal agencies; Massachusetts legislature; Massachusetts courts"
+  example_bad: "The law does not apply to certain branches of government."
+  extraction_mode: web
+
+# ============================================================
+# Layer B — agency_program.* operational facts (17 entries)
+# ============================================================
+
+- field_path: agency_program.administering_agency.name
+  question_template: "Which state-level agency administers {program} in {state}?"
+  answer_format: agency_full_name
+  max_length: 120
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: high
+  example_good: "Massachusetts Department of Transitional Assistance"
+  example_bad: "The state's transitional assistance agency."
+  extraction_mode: web
+
+- field_path: agency_program.administering_agency.abbreviation
+  question_template: "What is the standard abbreviation used for the state-level agency that administers {program} in {state}?"
+  answer_format: agency_abbreviation
+  max_length: 6
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: high
+  example_good: "DTA"
+  example_bad: "Department of Transitional Assistance"
+  extraction_mode: web
+
+- field_path: agency_program.sub_agency
+  question_template: "Within the state-level agency that administers {program} in {state}, what separately-named sub-agency, division, or bureau handles eligibility and case management?"
+  answer_format: not_available
+  max_length: 200
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: medium
+  example_good: '{"value": null, "reason": "no separately-named SNAP sub-agency within DTA"}'
+  example_bad: "There is no sub-agency."
+  extraction_mode: web
+  notes: "MA SNAP has no separately-named sub-agency within DTA; field is null in the playbook. Phase 3 should return the not_available sentinel."
+
+- field_path: agency_program.records_officer.name
+  question_template: "Who is the Primary Records Access Officer for the state-level agency that administers {program} in {state}?"
+  answer_format: officer_name
+  max_length: 60
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: high
+  example_good: "Lauren Picone"
+  example_bad: "The RAO's contact info is on the DTA Public Records page."
+  extraction_mode: web
+
+- field_path: agency_program.records_officer.title
+  question_template: "What public-records role title does the Primary Records Access Officer at the state-level agency that administers {program} in {state} hold?"
+  answer_format: officer_title
+  max_length: 80
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: high
+  example_good: "Records Access Officer"
+  example_bad: "The person who handles public records requests."
+  extraction_mode: web
+
+- field_path: agency_program.records_officer.org_title
+  question_template: "What organizational job title (separate from the Records Access Officer role) does the Primary RAO at the state-level agency that administers {program} in {state} hold?"
+  answer_format: officer_title
+  max_length: 80
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: medium
+  example_good: "Deputy General Counsel"
+  example_bad: "An attorney at the agency."
+  extraction_mode: web
+
+- field_path: agency_program.contact.email
+  question_template: "What email address should a requester use to file or follow up on a public records request with the state-level agency that administers {program} in {state}?"
+  answer_format: email
+  max_length: 80
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: high
+  example_good: "DTA.RAO@state.ma.us"
+  example_bad: "Email the agency at the address listed online."
+  extraction_mode: web
+
+- field_path: agency_program.contact.phone
+  question_template: "What phone number should the public use to contact the public records office of the state-level agency that administers {program} in {state}?"
+  answer_format: phone
+  max_length: 10
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: medium
+  example_good: "6173485247"
+  example_bad: "(617) 348-5247"
+  extraction_mode: web
+
+- field_path: agency_program.contact.address_line1
+  question_template: "What is the mailing address of the state-level agency that administers {program} in {state}?"
+  answer_format: street_address
+  max_length: 120
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: medium
+  example_good: "One Ashburton Place, Boston, MA"
+  example_bad: "On Ashburton Place in Boston."
+  extraction_mode: web
+  notes: "Derive script composes 'address_line1, city, state' from sibling contact.{city,state}."
+
+- field_path: agency_program.contact.zip
+  question_template: "What is the ZIP code of the mailing address of the state-level agency that administers {program} in {state}?"
+  answer_format: zip5
+  max_length: 5
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: medium
+  example_good: "02108"
+  example_bad: "02108-1234"
+  extraction_mode: web
+
+- field_path: agency_program.portal.name
+  question_template: "What is the name of the official online portal used to submit public records requests to the state-level agency that administers {program} in {state}?"
+  answer_format: agency_full_name
+  max_length: 120
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: medium
+  example_good: "DTA Public Records Request Form"
+  example_bad: "The agency offers an online portal."
+  extraction_mode: web
+
+- field_path: agency_program.portal.url
+  question_template: "What is the URL of the official online portal used to submit public records requests to the state-level agency that administers {program} in {state}?"
+  answer_format: url
+  max_length: 200
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: high
+  example_good: "https://www.mass.gov/forms/submit-a-department-of-transitional-assistance-dta-public-records-request-prr"
+  example_bad: "Visit mass.gov and search for the DTA public records form."
+  extraction_mode: web
+
+- field_path: agency_program.portal.required_fields
+  question_template: "Which fields are marked required on the official online portal used to submit public records requests to the state-level agency that administers {program} in {state}?"
+  answer_format: string_list
+  max_length: 300
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: low
+  example_good: "description_or_summary_of_request; first_and_last_name; name_of_organization; requestor_email"
+  example_bad: "Several fields are required, including your name and email."
+  extraction_mode: web
+
+- field_path: agency_program.submission_methods
+  question_template: "Which submission methods does the state-level agency that administers {program} in {state} accept for a public records request?"
+  answer_format: string_list
+  max_length: 80
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: medium
+  example_good: "email; mail; portal; fax; in_person"
+  example_bad: "You can submit your request by email, mail, fax, the portal, or in person."
+  extraction_mode: web
+
+- field_path: agency_program.program_aliases
+  question_template: "By what other names is {program} commonly referred to in {state}?"
+  answer_format: string_list
+  max_length: 200
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: low
+  example_good: "Supplemental Nutrition Assistance Program; SNAP; food stamps; food assistance"
+  example_bad: "It is also known as food stamps."
+  extraction_mode: web
+
+- field_path: agency_program.known_system_names
+  question_template: "Which named information systems does the state-level agency that administers {program} in {state} publicly mention for benefits administration?"
+  answer_format: string_list
+  max_length: 200
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: low
+  example_good: "BEACON; EPPIC; DTA Connect"
+  example_bad: "The agency uses multiple systems including BEACON and others."
+  extraction_mode: web
+
+- field_path: agency_program.known_vendors
+  question_template: "Which named third-party vendors does the state-level agency that administers {program} in {state} publicly mention for benefits-related services?"
+  answer_format: string_list
+  max_length: 200
+  source_pattern: "^https?://(www\\.)?mass\\.gov/"
+  certification_threshold: low
+  example_good: "Fidelity Information Services (FIS); Conduent"
+  example_bad: "FIS handles EBT, among other vendors."
+  extraction_mode: web
+
+# ============================================================
+# Layer C — agency_program.benefits_tech_systems[N].* (8 entries)
+# All production-document-grounded; not eligible for Phase 3 web extraction.
+# ============================================================
+
+- field_path: agency_program.benefits_tech_systems[0].vendor_name
+  question_template: "Which vendor supplies the CLEAR/CLEAR ProFlex investigative platform used by the agency that administers {program} in {state}?"
+  answer_format: agency_full_name
+  max_length: 120
+  source_pattern: ".*"
+  certification_threshold: medium
+  example_good: "Thomson Reuters Enterprise Centre GmbH / West Publishing Corporation"
+  example_bad: "Thomson Reuters or one of its subsidiaries"
+  extraction_mode: manual_production_doc
+  notes: "Production-document-only; sourced from gold_letter.pdf (Thomson Reuters Order Form Q-08237974). Not eligible for Phase 3 web extraction."
+
+- field_path: agency_program.benefits_tech_systems[0].product_names
+  question_template: "Which product names appear on the Thomson Reuters / West Publishing order form for the agency that administers {program} in {state}?"
+  answer_format: string_list
+  max_length: 200
+  source_pattern: ".*"
+  certification_threshold: medium
+  example_good: "CLEAR; CLEAR ProFlex; CLEAR Government Investigations Advanced; Batch Person Search (4,800 annual inputs)"
+  example_bad: "CLEAR and some related products."
+  extraction_mode: manual_production_doc
+
+- field_path: agency_program.benefits_tech_systems[0].use_cases
+  question_template: "What use cases does the Thomson Reuters / West Publishing CLEAR ProFlex platform serve for the agency that administers {program} in {state}?"
+  answer_format: string_list
+  max_length: 400
+  source_pattern: ".*"
+  certification_threshold: low
+  example_good: "Data lookup tool for fraud detection and identity verification (general-purpose investigative platform)"
+  example_bad: "It helps the agency investigate fraud."
+  extraction_mode: manual_production_doc
+
+- field_path: agency_program.benefits_tech_systems[0].programs_covered
+  question_template: "Which benefits programs does the Thomson Reuters / West Publishing CLEAR ProFlex platform cover at the agency that administers {program} in {state}?"
+  answer_format: string_list
+  max_length: 80
+  source_pattern: ".*"
+  certification_threshold: medium
+  example_good: "SNAP; TAFDC; EAEDC"
+  example_bad: "All of DTA's main benefit programs."
+  extraction_mode: manual_production_doc
+
+- field_path: agency_program.benefits_tech_systems[1].vendor_name
+  question_template: "Which vendor supplies the ID Risk Analytics (IDRA) system used by the agency that administers {program} in {state}?"
+  answer_format: agency_full_name
+  max_length: 120
+  source_pattern: ".*"
+  certification_threshold: medium
+  example_good: "West Publishing Corporation (a Thomson Reuters business)"
+  example_bad: "Thomson Reuters or one of its subsidiaries"
+  extraction_mode: manual_production_doc
+  notes: "Production-document-only; sourced from gold_letter.pdf (West Publishing Statement of Work). Not eligible for Phase 3 web extraction."
+
+- field_path: agency_program.benefits_tech_systems[1].product_names
+  question_template: "Which product names appear on the West Publishing Statement of Work for ID Risk Analytics at the agency that administers {program} in {state}?"
+  answer_format: string_list
+  max_length: 200
+  source_pattern: ".*"
+  certification_threshold: medium
+  example_good: "ID Risk Analytics (IDRA); CLEAR ID Confirm"
+  example_bad: "IDRA and a related identity-verification product."
+  extraction_mode: manual_production_doc
+
+- field_path: agency_program.benefits_tech_systems[1].use_cases
+  question_template: "What use cases does the West Publishing ID Risk Analytics (IDRA) system serve for the agency that administers {program} in {state}?"
+  answer_format: string_list
+  max_length: 800
+  source_pattern: ".*"
+  certification_threshold: low
+  example_good: "Identity-risk analytics over SNAP recipient population (heads of household) for fraud/identity-verification flagging; Aggregate risk dashboards displaying applicants binned high/medium/low risk; Configured anomaly alerts (shared home address, IP address, email address, deceased recipients)"
+  example_bad: "It analyzes identity risk for SNAP recipients."
+  extraction_mode: manual_production_doc
+
+- field_path: agency_program.benefits_tech_systems[1].programs_covered
+  question_template: "Which benefits programs does the West Publishing ID Risk Analytics (IDRA) system cover at the agency that administers {program} in {state}?"
+  answer_format: string_list
+  max_length: 80
+  source_pattern: ".*"
+  certification_threshold: medium
+  example_good: "SNAP"
+  example_bad: "All of DTA's main benefit programs."
+  extraction_mode: manual_production_doc

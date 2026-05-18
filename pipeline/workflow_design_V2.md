@@ -1,6 +1,6 @@
 # Workflow Design V2 — Benefits Decoded Public Records Pipeline
 
-> **Status:** supersedes [`workflow_design_V1.md`](workflow_design_V1.md). V1 is preserved alongside this document as a design history.
+> **Status:** supersedes `[workflow_design_V1.md](workflow_design_V1.md)`. V1 is preserved alongside this document as a design history.
 >
 > **Precedence:** when this document conflicts with the proposal at `docs/Benefits_Decoded_Project_Proposal.pdf`, this document wins (per RA decision). The proposal sets the long-term scientific aims; V2 sets the engineering plan to reach them.
 >
@@ -16,7 +16,7 @@ We are building a reproducible LLM-assisted pipeline that turns official state g
 2. **Three-artifact decomposition.** The single playbook schema in V1 is split into `state_law` (50 rows long-term), `agency_program` (~300 rows long-term), and `request_modules` (jurisdiction-independent content blocks). Cardinality, update cadence, and authorship differ across the three; mixing them creates duplication and drift risk.
 3. **Gold request + successful production before schema lock.** We recover or reconstruct a complete, submittable MA SNAP request letter *first*, and we mine the PI-provided successful DTA production package (`gold_letter.pdf`) before locking schemas or modules. This catches schema gaps and teaches the pipeline what actually produced useful records.
 4. **Production-grounded request modules.** The request body is seeded from DTA's successful request language and the responsive Thomson Reuters / West Publishing CLEAR / ID Risk Analytics records, not only from generic FOIA examples.
-5. **Short-answer typed extraction in Phase 3.** The current free-form "research and answer" prompt is replaced by a per-question-type prompt that constrains the LLM to a single typed value with explicit length and format limits (e.g., phone is exactly 10 digits, statute citation is one line ≤ 60 chars). This makes scoring near-deterministic and dramatically reduces matcher complexity in [`exp_results/score_experiments.py`](../exp_results/score_experiments.py).
+5. **Short-answer typed extraction in Phase 3.** The current free-form "research and answer" prompt is replaced by a per-question-type prompt that constrains the LLM to a single typed value with explicit length and format limits (e.g., phone is exactly 10 digits, statute citation is one line ≤ 60 chars). This makes scoring near-deterministic and dramatically reduces matcher complexity in `[exp_results/score_experiments.py](../exp_results/score_experiments.py)`.
 6. **Two-layer programmatic-then-semantic validation.** Phase 5 runs a deterministic checklist (Layer 1a) before any LLM-as-judge cost is paid (Layer 1b), and only escalates to human review (Layer 2) for drafts that survive both.
 
 The doc is organized as **plan → reasoning → deliverables** in every phase so it functions as a design rationale, not a checklist.
@@ -25,20 +25,22 @@ The doc is organized as **plan → reasoning → deliverables** in every phase s
 
 ## 1. What changes from V1 — auditable delta
 
-| Topic | V1 | V2 | Why we changed it |
-|---|---|---|---|
-| Pilot scope | 5 states × pilot programs (proposal-aligned) | **MA × SNAP single cell** end-to-end | Breadth-first means failures are confounded across states/programs; depth-first isolates the architectural failure mode. |
-| Playbook schema | One schema per `(state, program, agency)` row, ~300 rows | **Three artifacts**: `state_law` (50), `agency_program` (300), `request_modules` (~8) | State-law facts duplicate 6× across programs in V1. Splitting eliminates drift and parallelizes research. |
-| Schema design timing | Schema first, then research populates it | **Gold request + successful production first, schema decomposed from both** | Catches missing slots cheaply; gives end-to-end ground truth for Phase 5; uses empirical evidence about what DTA actually produced. |
-| Production precedent | Not represented | **PI-provided DTA production package mined in Phase 1** | The successful MA DTA response includes Thomson Reuters / West Publishing CLEAR / ID Risk Analytics records, giving production-grounded request modules and benefits-tech system fields. |
-| Phase 3 prompt | Free-form "research and answer" with self-reported source | **Typed short-answer extraction** with length, format, and grounding constraints | Tight outputs collapse matcher complexity and reduce hallucination surface. |
-| Source grounding | Self-reported source URL in the answer JSON | **Retrieval-grounded for web facts; production-document provenance for manually mined facts** | Bounds the LLM to retrieved web evidence while allowing local PDFs and public-records productions to support facts that are not on agency webpages. |
-| Certification criterion | Implicit: V1 §"Opt2" suggested ≥0.6 self-consistency on best model; proposal A1.3 says "100% agreement" | **Tiered: auto-certify / soft-certify / manual-queue**, combining cross-model + self-consistency + .gov source | 100% three-way agreement is unreachable per current Tier 1 results (Opus 76%, Gemma 44%, GPT-OSS 36%). Tiered criteria preserve volume while still routing hard cases to humans. |
-| Validation | "MuckRock LLM-as-judge" + human review | **Layer 1a programmatic checklist → Layer 1b DTA-precedent + MuckRock judge → Layer 2 human review** | Most missing-slot defects are deterministic; we shouldn't pay LLM cost for them. |
-| Question set | Hand-curated list of example questions | **Auto-derived from schema slots**, one question per field with type-specific scoring | Keeps questions in lockstep with schema; refactor-safe. |
-| Schema fields | 10 top-level keys | **Adds**: fee-waiver citation, expedited-processing citation, record definition, certification language, segregation clause, residency restriction, portal schema, state-specific quirks, `benefits_tech_systems[]`, mixed evidence provenance, plus reserved operational/tracking fields | Real FOIA letters need legal facts; benefits-tech requests also need structured vendor/system facts. Reserved fields prevent schema migration pain when we add the campaign tracker. |
-| Promotion logic | "Pilot then scale" (1-step) | **Four explicit gates** (v1 → v2 → v3 → scale) with quantitative pass criteria | Each gate adds one axis of variation, so failures are diagnosable to the dimension that changed. |
-| Repo hygiene | `pipline/` (typo), `drafting_prompt.text`, empty placeholders | **`pipeline/` rename completed**; normalized prompt filenames and canonical playbook artifacts remain pending | Quality-of-life; path cleanup is now done before the doc tree calcifies. |
+
+| Topic                   | V1                                                                                                      | V2                                                                                                                                                                                                                                                                                        | Why we changed it                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pilot scope             | 5 states × pilot programs (proposal-aligned)                                                            | **MA × SNAP single cell** end-to-end                                                                                                                                                                                                                                                      | Breadth-first means failures are confounded across states/programs; depth-first isolates the architectural failure mode.                                                                 |
+| Playbook schema         | One schema per `(state, program, agency)` row, ~300 rows                                                | **Three artifacts**: `state_law` (50), `agency_program` (300), `request_modules` (~8)                                                                                                                                                                                                     | State-law facts duplicate 6× across programs in V1. Splitting eliminates drift and parallelizes research.                                                                                |
+| Schema design timing    | Schema first, then research populates it                                                                | **Gold request + successful production first, schema decomposed from both**                                                                                                                                                                                                               | Catches missing slots cheaply; gives end-to-end ground truth for Phase 5; uses empirical evidence about what DTA actually produced.                                                      |
+| Production precedent    | Not represented                                                                                         | **PI-provided DTA production package mined in Phase 1**                                                                                                                                                                                                                                   | The successful MA DTA response includes Thomson Reuters / West Publishing CLEAR / ID Risk Analytics records, giving production-grounded request modules and benefits-tech system fields. |
+| Phase 3 prompt          | Free-form "research and answer" with self-reported source                                               | **Typed short-answer extraction** with length, format, and grounding constraints                                                                                                                                                                                                          | Tight outputs collapse matcher complexity and reduce hallucination surface.                                                                                                              |
+| Source grounding        | Self-reported source URL in the answer JSON                                                             | **Retrieval-grounded for web facts; production-document provenance for manually mined facts**                                                                                                                                                                                             | Bounds the LLM to retrieved web evidence while allowing local PDFs and public-records productions to support facts that are not on agency webpages.                                      |
+| Certification criterion | Implicit: V1 §"Opt2" suggested ≥0.6 self-consistency on best model; proposal A1.3 says "100% agreement" | **Tiered: auto-certify / soft-certify / manual-queue**, combining single-model self-consistency + allowed-domain source. Multi-model cross-checking deferred to future work (see §7.3).                                                                                                  | The README Tier 1 result (Opus 76%, Gemma 44%, GPT-OSS 36%) showed cross-model agreement is dominated by the single strongest model. V2 collapses Phase 3 to Claude Opus 4.7 alone, keeps self-consistency and source-domain as the two orthogonal signals, and reroutes the multi-model cost into other parts of the pipeline. |
+| Validation              | "MuckRock LLM-as-judge" + human review                                                                  | **Layer 1a programmatic checklist → Layer 1b DTA-precedent + MuckRock judge → Layer 2 human review**                                                                                                                                                                                      | Most missing-slot defects are deterministic; we shouldn't pay LLM cost for them.                                                                                                         |
+| Question set            | Hand-curated list of example questions                                                                  | **Auto-derived from schema slots**, one question per field with type-specific scoring                                                                                                                                                                                                     | Keeps questions in lockstep with schema; refactor-safe.                                                                                                                                  |
+| Schema fields           | 10 top-level keys                                                                                       | **Adds**: fee-waiver citation, expedited-processing citation, record definition, certification language, segregation clause, residency restriction, portal schema, state-specific quirks, `benefits_tech_systems[]`, mixed evidence provenance, plus reserved operational/tracking fields | Real FOIA letters need legal facts; benefits-tech requests also need structured vendor/system facts. Reserved fields prevent schema migration pain when we add the campaign tracker.     |
+| Promotion logic         | "Pilot then scale" (1-step)                                                                             | **Four explicit gates** (v1 → v2 → v3 → scale) with quantitative pass criteria                                                                                                                                                                                                            | Each gate adds one axis of variation, so failures are diagnosable to the dimension that changed.                                                                                         |
+| Repo hygiene            | `pipline/` (typo), `drafting_prompt.text`, empty placeholders                                           | `**pipeline/` rename completed**; normalized prompt filenames and canonical playbook artifacts remain pending                                                                                                                                                                             | Quality-of-life; path cleanup is now done before the doc tree calcifies.                                                                                                                 |
+
 
 ---
 
@@ -67,7 +69,7 @@ flowchart TD
     subgraph p3 [Phase 3: Short-Answer Extraction]
         prompt[3a: Typed short-answer prompt]
         retrieve[3b: Retrieval-grounded extraction]
-        runs[3c: Multi-model self-consistency runs]
+        runs[3c: Single-model self-consistency runs]
         cert[3d: Tiered certification gate]
         prompt --> retrieve --> runs --> cert
     end
@@ -92,7 +94,10 @@ flowchart TD
     layer2 --> gates[Phase 6: Promotion gates]
 ```
 
+
+
 Three things are flowing through the pipeline:
+
 - **Structured facts** (state law, agency contacts, benefits-tech system facts) — produced in Phase 1, validated in Phase 3 where web-extractable, consumed in Phase 4.
 - **Modular content** (request modules per the proposal's A2.1 categories) — seeded from the successful DTA production package, authored once, reused everywhere.
 - **Letters** — composed in Phase 4, validated in Phase 5, sent in Phase 6+ (out of V2 scope).
@@ -122,7 +127,7 @@ V2's deliverables target **Massachusetts × SNAP** only. Concretely this means:
 - One file at `pipeline/playbook/agency_program/MA_SNAP.json`.
 - One benchmark CSV at `pipeline/benchmarks/MA_SNAP_benchmark.csv`.
 - One generated letter at `pipeline/generated_requests/MA_SNAP.txt` (plus snapshot).
-- One precedent package at `pipeline/precedents/MA_DTA_ADS_2026/`, derived from [`pipeline/gold_letters/gold_letter.pdf`](gold_letters/gold_letter.pdf).
+- One precedent package at `pipeline/precedents/MA_DTA_ADS_2026/`, derived from `[pipeline/gold_letters/gold_letter.pdf](gold_letters/gold_letter.pdf)`.
 - Modules in `pipeline/request_modules/` are written generically (jurisdiction-independent), seeded from the successful DTA production package, and only verified against MA SNAP for V2.
 
 Schemas at `pipeline/schemas/` are designed generically (so they work for all 50 states / 6 programs eventually), but only **populated** for MA SNAP in V2. Generality is in the schema; specificity is in the data.
@@ -133,7 +138,7 @@ Schemas at `pipeline/schemas/` are designed generically (so they work for all 50
 
 ### 5.1 Step 1a — Spec-by-example: recover or draft the MA SNAP gold request
 
-**Plan.** Start from the PI-provided successful production package at [`pipeline/gold_letters/gold_letter.pdf`](gold_letters/gold_letter.pdf). If the exact outbound public-records request is available, use it as the base text. If it is not available, reconstruct the request from the scope quoted in DTA's response letter, clearly mark it as reconstructed, and have a human (RA) turn it into one complete, submittable Massachusetts public records request letter targeting SNAP at the Department of Transitional Assistance (DTA).
+**Plan.** Start from the PI-provided successful production package at `[pipeline/gold_letters/gold_letter.pdf](gold_letters/gold_letter.pdf)`. If the exact outbound public-records request is available, use it as the base text. If it is not available, reconstruct the request from the scope quoted in DTA's response letter, clearly mark it as reconstructed, and have a human (RA) turn it into one complete, submittable Massachusetts public records request letter targeting SNAP at the Department of Transitional Assistance (DTA).
 
 The DTA response is not itself the outbound gold request. It is evidence that a request with this scope succeeded and produced responsive records. The recovered or reconstructed request is then annotated word-by-word as one of three categories:
 
@@ -153,11 +158,13 @@ The annotated version is committed alongside the unannotated one. The two togeth
 **Failure mode if skipped.** We design the schema in the abstract, run Phase 3 extraction, then in Phase 4 discover the LLM-drafted letter is missing a paragraph the state law actually requires. We then redesign the schema, re-run Phase 3 (re-paying token cost), and redo benchmarks.
 
 **Deliverables.**
-- [`pipeline/gold_letters/MA_SNAP.md`](pipeline/gold_letters/MA_SNAP.md) — the letter as it would be submitted.
+
+- `[pipeline/gold_letters/MA_SNAP.md](gold_letters/MA_SNAP.md)` — the letter as it would be submitted.
 - `pipeline/gold_letters/MA_SNAP.annotated.md` — the same letter with every word tagged.
 - `pipeline/gold_letters/MA_SNAP.source_note.md` — whether the request text is exact outbound PRR text or reconstructed from DTA's response.
 
 **Cross-references for the human writer.**
+
 - PI-provided DTA production package — primary empirical precedent for request scope.
 - BTAH Public Records Request Guide model letter (Arkansas DHS example) — solid baseline format with named individuals and keyword strategy.
 - FOIA Basics annotated tech FOIA request — definitions block, format-of-production block, fee-waiver block, expedited-processing block.
@@ -168,7 +175,7 @@ The annotated version is committed alongside the unannotated one. The two togeth
 
 ### 5.2 Step 1b — Mine successful DTA production package
 
-**Plan.** Treat [`pipeline/gold_letters/gold_letter.pdf`](gold_letters/gold_letter.pdf) as a successful MA DTA public-records production package. OCR it if necessary, then manually inventory and extract:
+**Plan.** Treat `[pipeline/gold_letters/gold_letter.pdf](gold_letters/gold_letter.pdf)` as a successful MA DTA public-records production package. OCR it if necessary, then manually inventory and extract:
 
 1. **Request scope that succeeded.** The response quotes a request for records about automated decision systems, algorithms, data-matching programs, artificial intelligence, machine learning, and predictive analytics used by DTA to assist with eligibility, fraud detection, or case-review flagging. V2 narrows implementation to SNAP, but preserves the broader phrasing because the successful request also named TAFDC and EAEDC.
 2. **Produced-document inventory.** Record each component of the production: DTA response letter, Thomson Reuters / West Publishing order form, product attachment, statement of work, and any enclosures or online-guide references.
@@ -176,11 +183,13 @@ The annotated version is committed alongside the unannotated one. The two togeth
 4. **Request-module seeds.** Convert the production's record categories and produced-document types into reusable module seeds.
 
 **Reasoning.**
+
 - This package is stronger than a generic exemplar because it tells us which words caused DTA to search and produce responsive benefits-tech records.
 - The responsive records reveal fields that public webpages are unlikely to contain, such as pricing, batch limits, data-file specifications, master design documents, and source-data responsibilities.
 - Mining it before schema lock prevents us from under-modeling vendor systems as only `known_vendors` and `known_system_names`.
 
 **Deliverables.**
+
 - `pipeline/precedents/MA_DTA_ADS_2026/request_excerpt.md` — exact outbound text if available, otherwise the reconstructed scope quoted by DTA.
 - `pipeline/precedents/MA_DTA_ADS_2026/production_inventory.yaml` — one entry per produced document / attachment.
 - `pipeline/precedents/MA_DTA_ADS_2026/extracted_facts.yaml` — structured benefits-tech facts with production-document evidence.
@@ -195,10 +204,7 @@ The annotated version is committed alongside the unannotated one. The two togeth
 **Proposed deep research prompt** (paste-ready):
 
 ```text
-You are a policy research assistant compiling a structured factual brief
-for a public records request directed at the Massachusetts Department of
-Transitional Assistance (DTA), regarding the Supplemental Nutrition
-Assistance Program (SNAP).
+You are a policy research assistant compiling a structured factual brief for a public records request directed at the Massachusetts Department of Transitional Assistance (DTA), regarding the Supplemental Nutrition Assistance Program (SNAP).
 
 # Source constraints (HARD)
 - Acceptable domains: *.gov, *.us, nfoic.org, btah.org, foiabasics.org,
@@ -271,6 +277,7 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
 ```
 
 **Reasoning.**
+
 - The `.gov` allowlist is the cheapest hallucination guard for URLs; the verbatim quote requirement is the cheapest hallucination guard for facts.
 - "Worked example for one cell first" (MA → schema → generalize) is more reliable than "design schema in the abstract."
 - Asking deep research to cross-check against NFOIC catches disagreements early.
@@ -279,6 +286,7 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
 **Failure mode if skipped.** We start Phase 3 extraction blind to which fields are even findable on MA's public sites, and waste runs on questions that have no answer at scale.
 
 **Deliverables.**
+
 - `pipeline/research/MA_SNAP_research.md` — the deep research output.
 - `pipeline/validation/muckrock_examples/MA_SNAP_*.md` — the 5 MuckRock exemplars copied locally for Phase 5.
 
@@ -288,7 +296,7 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
 
 **Plan.** Three schema files, all generic across states and programs:
 
-**`pipeline/schemas/state_law.schema.json`** — one row per state.
+`**pipeline/schemas/state_law.schema.json`** — one row per state.
 
 ```json
 {
@@ -369,7 +377,7 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
 }
 ```
 
-**`pipeline/schemas/agency_program.schema.json`** — one row per (state, program).
+`**pipeline/schemas/agency_program.schema.json**` — one row per (state, program).
 
 ```json
 {
@@ -510,7 +518,7 @@ containing columns: Field, Value, Source URL, Quoted Span, Accessed.
 }
 ```
 
-**`pipeline/schemas/request_modules.schema.yaml`** — one entry per content module.
+`**pipeline/schemas/request_modules.schema.yaml**` — one entry per content module.
 
 ```yaml
 $schema: http://json-schema.org/draft-07/schema#
@@ -557,6 +565,7 @@ properties:
 - `vendor_support_change_requests` — help-desk terms, support tickets, customer-success reviews, quarterly account reviews, feature requests, new data-source requests, and change orders.
 
 **Reasoning.**
+
 - Splitting along cardinality and update cadence (50 vs. 300 vs. 6) is the cleanest decomposition. Editing MA's response deadline in V1 meant editing 6 program rows; in V2 it's one edit.
 - `evidence` at the row level (not buried inside each field) makes it cheap to walk through every grounded claim during human review; the same shape supports `.gov` webpages and local production documents.
 - `benefits_tech_systems[]` prevents the MA DTA production facts from being flattened into generic vendor/system name lists. Pricing, seats, batch limits, data inputs, deliverables, and hosting/security/retention clauses are first-class facts because those are exactly the facts the successful production revealed.
@@ -577,6 +586,7 @@ properties:
 Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.annotated.md` must resolve to a populated, non-null path in the joined playbook. Any unresolved annotation is a schema gap and triggers a return to step 1d.
 
 **Reasoning.**
+
 - Hand-written, evidence-cited playbook = the ground truth. Phase 3 evaluation in Phase 6's promotion criteria is "does the LLM extraction recover this hand-verified value?"
 - The structural validation against the annotated gold request is the **closure check** for V2's design phase. Until it passes, we don't move to Phase 2.
 - The mined production package is also a closure check for the request modules: each produced-document type should either map to a module or be explicitly declared out of scope.
@@ -584,6 +594,7 @@ Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.anno
 **Deliverables.** Two populated JSON files; one human-readable diff report showing all gold-request slots are populated.
 
 **Phase 1 design-principles check.**
+
 - Composable templating? Yes — the playbook is the structured spine.
 - Three-artifact decomposition? Yes — schemas split cleanly.
 - Spec-by-example? Yes — gold request and successful production precede schema lock.
@@ -599,7 +610,7 @@ Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.anno
 
 **Plan.** Replace the hand-curated question list with a derivation: for each populated path in the schemas, emit one question spec.
 
-**`pipeline/questions/question_spec.yaml`** structure (excerpt):
+`**pipeline/questions/question_spec.yaml`** structure (excerpt):
 
 ```yaml
 - field_path: state_law.public_records_law.citation
@@ -640,17 +651,20 @@ Then run a structural validation: every `slot:<...>` annotation in `MA_SNAP.anno
 ```
 
 **Reasoning.**
+
 - A single source of truth (`question_spec.yaml`) keeps Phase 2 in lockstep with Phase 1. When a schema field is added, one file changes and the rest of the pipeline picks it up.
-- `answer_format` is the bridge between Phase 3 (prompts) and `score_experiments.py` (matchers). Today the matcher dispatch in [`exp_results/score_experiments.py:25-37`](../exp_results/score_experiments.py) classifies questions by keyword sniffing in the template; V2 makes this explicit and declarative.
+- `answer_format` is the bridge between Phase 3 (prompts) and `score_experiments.py` (matchers). Today the matcher dispatch in `[exp_results/score_experiments.py:25-37](../exp_results/score_experiments.py)` classifies questions by keyword sniffing in the template; V2 makes this explicit and declarative.
 - `source_pattern` is the cheapest sanity gate on URLs the LLM returns — if the source URL doesn't match, it doesn't count toward auto-certify.
 - Production-document-only fields from `benefits_tech_systems[]` are still represented in the playbook and benchmark, but they are flagged as `extraction_mode: manual_production_doc` rather than sent through the web-only Phase 3 extractor.
 - Per-question `certification_threshold` lets us be strict about high-stakes fields (statute citation, agency name) and tolerant about low-stakes ones (alias list).
 
+**Implementation note (V2 pilot realization).** The V2 pilot realizes "Auto-derive" as **hand-authored spec + auto-derived benchmark**, not fully automatic codegen from schemas. The structural metadata `question_spec.yaml` carries — natural-language `question_template`, `answer_format` choice from the V2 §7.1 taxonomy, MA-specific `source_pattern` allowlists, `certification_threshold`, and good/bad examples — is not recoverable from JSON Schema alone, and a separate annotations file plus codegen step is more moving parts than a 50-entry pilot warrants. Instead, [pipeline/questions/question_spec.yaml](questions/question_spec.yaml) is hand-authored against the structural contract at [pipeline/schemas/question_spec.schema.yaml](schemas/question_spec.schema.yaml); [pipeline/questions/derive_benchmark.py](questions/derive_benchmark.py) reads the spec and the populated playbooks and emits the benchmark in §6.2's column order; [pipeline/questions/validate_question_spec.py](questions/validate_question_spec.py) runs three audits — schema conformance, forward closure with documented `EXCLUDED_PATHS`, and reverse closure — and is the Phase 2 → Phase 3 gate. Long paraphrase fields (`record_definition`, `segregation_clause`, state-specific quirks, extension bases, required-assertion strings) and fields composed into a sibling question's ground_truth (`appeal_path.deadline_unit`, `contact.city`, `contact.state`) are listed in `EXCLUDED_PATHS` with reasons rather than silently skipped. Phase 3 sees one row per question_spec entry whether the question is web-extractable or production-doc-only.
+
 ### 6.2 Step 2b — Hand-verify the MA SNAP benchmark
 
-**Plan.** Today's [`data/benchmark.csv`](../data/benchmark.csv) has 5 questions × 5 states (16 rows total). For V2 we extend the same wide-format sheet into a focused MA-SNAP-only file containing one row per question in `question_spec.yaml`.
+**Plan.** Today's `[data/benchmark.csv](../data/benchmark.csv)` has 5 questions × 5 states (16 rows total). For V2 we extend the same wide-format sheet into a focused MA-SNAP-only file containing one row per question in `question_spec.yaml`.
 
-**`pipeline/benchmarks/MA_SNAP_benchmark.csv`** columns:
+`**pipeline/benchmarks/MA_SNAP_benchmark.csv`** columns:
 
 ```
 field_path, question_template, program, state, ground_truth, source_type, source_ref, quote, retrieved_at, received_at, page, document_title, production_package_id, answer_format, extraction_mode
@@ -659,10 +673,12 @@ field_path, question_template, program, state, ground_truth, source_type, source
 The `ground_truth` value is copied directly from the manually populated playbook (1e) — so the benchmark and the playbook are guaranteed consistent. For web-extractable facts, `source_type=url`, `source_ref` is the URL, and `retrieved_at` is populated. For facts mined from the DTA production package, `source_type=local_pdf` or `production_doc`, `source_ref` points to the local package/document id, and `received_at` is populated.
 
 **Reasoning.**
-- Phase 3 evaluation (and the scoring in [`exp_results/score_experiments.py`](../exp_results/score_experiments.py)) needs a reference value to compare against.
+
+- Phase 3 evaluation (and the scoring in `[exp_results/score_experiments.py](../exp_results/score_experiments.py)`) needs a reference value to compare against.
 - Sourcing the benchmark from the populated playbook (rather than independently hand-writing it) eliminates an entire class of "playbook says X, benchmark says Y" inconsistency bugs.
 
 **Phase 2 design-principles check.**
+
 - Bounded LLM tasks? N/A — Phase 2 is all derivation.
 - Auditability? Yes — every benchmark row carries mixed provenance + quote.
 
@@ -672,37 +688,40 @@ The `ground_truth` value is copied directly from the manually populated playbook
 
 ## 7. Phase 3 — Short-answer typed extraction
 
-This is the redesigned core of V2. Today's [`exp_results/run_experiment.py:28-36`](../exp_results/run_experiment.py) `SYSTEM_PROMPT` asks the model to "answer the question" and self-report a source. V2 replaces this with a typed extraction that returns a single short value.
+This is the redesigned core of V2. Today's `[exp_results/run_experiment.py:28-36](../exp_results/run_experiment.py)` `SYSTEM_PROMPT` asks the model to "answer the question" and self-report a source. V2 replaces this with a typed extraction that returns a single short value.
 
 ### 7.1 Step 3a — Per-question-type answer taxonomy
 
 The full taxonomy V2 commits to:
 
-| `answer_format` | Allowed shape | Max length | Example good | Example bad |
-|---|---|---|---|---|
-| `agency_full_name` | Free string with optional `(ABBREV)` parenthetical | 120 chars | `Massachusetts Department of Transitional Assistance (DTA)` | `The DTA is responsible for SNAP in Massachusetts.` |
-| `agency_abbreviation` | 2-6 uppercase letters | 6 chars | `DTA` | `Department of Transitional Assistance` |
-| `officer_name` | 1-4 words, letters / dots / hyphens / spaces only | 60 chars | `Sarah Coleman` | `The records officer (you can find their name on the website)` |
-| `officer_title` | 2-8 words | 80 chars | `Records Access Officer` | `The person responsible for handling records requests is...` |
-| `email` | Single RFC-5322 email, lowercase normalized | 80 chars | `publicrecords@dta.state.ma.us` | `Email the agency at the address listed online.` |
-| `phone` | Exactly 10 digits, no formatting | 10 chars | `8773822363` | `(877) 382-2363` |
-| `street_address` | Single line | 80 chars | `600 Washington Street, Boston, MA 02111` | `It's at the DTA central office on Washington Street.` |
-| `po_box` | `PO Box {N}` exactly | 20 chars | `PO Box 4406` | `P.O. Box four-four-zero-six` |
-| `zip5` | 5 digits | 5 chars | `02111` | `02111-1234` |
-| `zip9` | `NNNNN-NNNN` | 10 chars | `02111-1234` | `02111` |
-| `statute_citation` | One line, state-specific format | 60 chars | `M.G.L. c. 66, § 10` | `Mass General Laws chapter 66 section 10` |
-| `deadline_days` | `N business days` or `N calendar days` exactly, primary deadline only | 25 chars | `10 business days` | `10 business days, with possible 20-day extension` |
-| `extension_days` | Same shape, separate field | 25 chars | `20 business days` | `up to 20 additional business days` |
-| `boolean` | `yes` or `no` exactly | 3 chars | `yes` | `In most cases, yes.` |
-| `enum` | One token from a per-question allowed list | varies | `email` | `you can submit by email or mail` |
-| `url` | Single absolute URL | 200 chars | `https://www.mass.gov/forms/public-records-request` | `Visit mass.gov and search for public records.` |
-| `multi_field` | JSON object with named keys, each conforming to one of the above | 400 chars | `{"name": "Sarah Coleman", "title": "Records Access Officer"}` | A natural-language paragraph |
-| `not_available` | Sentinel: `value: null`, `reason: <short string>` | n/a | `{"value": null, "reason": "no MA-specific SNAP RAO published"}` | `I don't know.` |
+
+| `answer_format`       | Allowed shape                                                         | Max length | Example good                                                     | Example bad                                                    |
+| --------------------- | --------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------- | -------------------------------------------------------------- |
+| `agency_full_name`    | Free string with optional `(ABBREV)` parenthetical                    | 120 chars  | `Massachusetts Department of Transitional Assistance (DTA)`      | `The DTA is responsible for SNAP in Massachusetts.`            |
+| `agency_abbreviation` | 2-6 uppercase letters                                                 | 6 chars    | `DTA`                                                            | `Department of Transitional Assistance`                        |
+| `officer_name`        | 1-4 words, letters / dots / hyphens / spaces only                     | 60 chars   | `Sarah Coleman`                                                  | `The records officer (you can find their name on the website)` |
+| `officer_title`       | 2-8 words                                                             | 80 chars   | `Records Access Officer`                                         | `The person responsible for handling records requests is...`   |
+| `email`               | Single RFC-5322 email, lowercase normalized                           | 80 chars   | `publicrecords@dta.state.ma.us`                                  | `Email the agency at the address listed online.`               |
+| `phone`               | Exactly 10 digits, no formatting                                      | 10 chars   | `8773822363`                                                     | `(877) 382-2363`                                               |
+| `street_address`      | Single line                                                           | 80 chars   | `600 Washington Street, Boston, MA 02111`                        | `It's at the DTA central office on Washington Street.`         |
+| `po_box`              | `PO Box {N}` exactly                                                  | 20 chars   | `PO Box 4406`                                                    | `P.O. Box four-four-zero-six`                                  |
+| `zip5`                | 5 digits                                                              | 5 chars    | `02111`                                                          | `02111-1234`                                                   |
+| `zip9`                | `NNNNN-NNNN`                                                          | 10 chars   | `02111-1234`                                                     | `02111`                                                        |
+| `statute_citation`    | One line, state-specific format                                       | 60 chars   | `M.G.L. c. 66, § 10`                                             | `Mass General Laws chapter 66 section 10`                      |
+| `deadline_days`       | `N business days` or `N calendar days` exactly, primary deadline only | 25 chars   | `10 business days`                                               | `10 business days, with possible 20-day extension`             |
+| `extension_days`      | Same shape, separate field                                            | 25 chars   | `20 business days`                                               | `up to 20 additional business days`                            |
+| `boolean`             | `yes` or `no` exactly                                                 | 3 chars    | `yes`                                                            | `In most cases, yes.`                                          |
+| `enum`                | One token from a per-question allowed list                            | varies     | `email`                                                          | `you can submit by email or mail`                              |
+| `url`                 | Single absolute URL                                                   | 200 chars  | `https://www.mass.gov/forms/public-records-request`              | `Visit mass.gov and search for public records.`                |
+| `multi_field`         | JSON object with named keys, each conforming to one of the above      | 400 chars  | `{"name": "Sarah Coleman", "title": "Records Access Officer"}`   | A natural-language paragraph                                   |
+| `not_available`       | Sentinel: `value: null`, `reason: <short string>`                     | n/a        | `{"value": null, "reason": "no MA-specific SNAP RAO published"}` | `I don't know.`                                                |
+
 
 **Reasoning.**
-- Today's matcher in [`exp_results/score_experiments.py:59-83`](../exp_results/score_experiments.py) has to disambiguate primary vs. extension deadlines using regex disqualifiers (`additional`, `extend`, `extra`, `more`, `further`). With `deadline_days` returning *only the primary deadline*, that whole disambiguation goes away.
+
+- Today's matcher in `[exp_results/score_experiments.py:59-83](../exp_results/score_experiments.py)` has to disambiguate primary vs. extension deadlines using regex disqualifiers (`additional`, `extend`, `extra`, `more`, `further`). With `deadline_days` returning *only the primary deadline*, that whole disambiguation goes away.
 - Splitting `deadline_days` and `extension_days` into two fields is the right factoring; today's CSV stores them as one composite string that the matcher has to parse.
-- `phone` returning exactly 10 digits eliminates the formatting normalization at [`exp_results/score_experiments.py:113-124`](../exp_results/score_experiments.py).
+- `phone` returning exactly 10 digits eliminates the formatting normalization at `[exp_results/score_experiments.py:113-124](../exp_results/score_experiments.py)`.
 - `not_available` as a first-class sentinel encourages the model to abstain rather than fabricate. This is the single biggest hallucination control.
 - Per-format examples (good and bad) in `question_spec.yaml` get embedded in the prompt at runtime, making the constraint explicit at the point of generation.
 
@@ -792,67 +811,77 @@ Expected model output:
 ```
 
 **Reasoning.**
-- The output schema is enforced by the prompt and validated programmatically post-hoc; if the JSON is malformed or `value` violates the format, the run is treated as a parse error and re-tried with a back-off, mirroring today's [`exp_results/run_experiment.py:79-135`](../exp_results/run_experiment.py) retry logic.
+
+- The output schema is enforced by the prompt and validated programmatically post-hoc; if the JSON is malformed or `value` violates the format, the run is treated as a parse error and re-tried with a back-off, mirroring today's `[exp_results/run_experiment.py:79-135](../exp_results/run_experiment.py)` retry logic.
 - Including `example_good` and `example_bad` is the cheapest in-context conditioning we have. It's worth ~10 lines of prompt to save dozens of malformed runs.
 - The `not_available` sentinel + `confidence` field lets the certification gate (3d) make tiered decisions instead of forcing a binary correct/incorrect.
 
 ### 7.3 Step 3c — Retrieval grounding
 
-**Plan.** For V2 pilot, use **web-tool-enabled model variants** for Phase 3:
+**Plan.** For V2 pilot, use a **single web-tool-enabled model** for Phase 3:
+
 - Anthropic Claude Opus 4.7 with web tool.
-- OpenAI GPT-5-class with web search.
-- Google Gemini 2.x-class with grounding.
 
-These models execute the retrieve-then-answer loop inside their own tool calls, so we can keep the existing OpenRouter-based orchestration in [`exp_results/run_experiment.py`](../exp_results/run_experiment.py) (or a fork) without building a separate retriever layer.
+The model executes the retrieve-then-answer loop inside its own tool calls, so we can keep the existing OpenRouter-based orchestration in `[exp_results/run_experiment.py](../exp_results/run_experiment.py)` (or a fork) without building a separate retriever layer.
 
-**V3 upgrade path** (out of V2 scope): switch to external retrieval — use Tavily/Bing/Google Programmable Search filtered to `.gov`, fetch top-N HTML, pass content + question to non-tool models. This will be cheaper at scale and gives us deterministic source selection.
+**Future work — multi-model cross-checking (deferred to V3 / out of V2 scope).** Earlier benchmarks compared three families (Claude Opus 4.7, Google Gemma, OpenAI GPT-OSS) and found that cross-model agreement is dominated by the single strongest model — Opus 76% accuracy vs Gemma 44% vs GPT-OSS 36% (see `[README.md` lines 49-53](../README.md)`). The signal added by the weaker two models was not large enough to justify the 3× cost in the pilot, so V2 collapses Phase 3 to Opus alone. The architecture can be re-extended to multi-model when (a) lower-cost frontier models become competitive with Opus on this task, or (b) a specific class of MA SNAP fields turns out to be where Opus disagrees with itself across runs but a second family would settle it.
+
+**V3 upgrade path** (also out of V2 scope): switch to external retrieval — use Tavily/Bing/Google Programmable Search filtered to `.gov`, fetch top-N HTML, pass content + question to non-tool models. This will be cheaper at scale and gives us deterministic source selection.
 
 **Reasoning.**
-- Building a retriever is real engineering work and not the bottleneck for the pilot. The bottleneck is verifying the *architecture* (typed extraction + tiered certification + programmatic validation) works; web-tool-enabled models suffice for that.
+
+- Building a retriever is real engineering work and not the bottleneck for the pilot. The bottleneck is verifying the *architecture* (typed extraction + tiered certification + programmatic validation) works; one web-tool-enabled model suffices for that.
+- Single-model Phase 3 drops the per-question call count from 15 to 5, reducing the MA SNAP run cost ~3× and making early iterations on the typed-extraction prompt cheap to retry.
 - We'll measure on MA SNAP whether grounded extraction outperforms today's free-form recall. If yes, the V3 retriever is justified.
 
-### 7.4 Step 3d — Multi-model self-consistency runs
+### 7.4 Step 3d — Single-model self-consistency runs
 
-**Plan.** Reuse [`exp_results/run_experiment.py`](../exp_results/run_experiment.py) (with a small fork that accepts the new prompt template) and [`exp_results/summarize_experiments.py`](../exp_results/summarize_experiments.py) as-is.
+**Plan.** Reuse `[exp_results/run_experiment.py](../exp_results/run_experiment.py)` (with a small fork that accepts the new prompt template) and `[exp_results/summarize_experiments.py](../exp_results/summarize_experiments.py)` as-is.
 
-- Default: 3 models × 5 runs each per question = 15 calls per question.
-- Models: Claude Opus 4.7 (paid), GPT-5-class (paid), Gemini 2.x-class (paid or free as available on OpenRouter).
-- Self-consistency: for each (model, question), the majority value across 5 runs.
-- Cross-model: for each question, the majority of the three models' majorities.
+- Default: 1 model × 5 runs per question = 5 calls per question.
+- Model: Claude Opus 4.7 (paid, web-tool-enabled).
+- Self-consistency: the majority value across the 5 runs.
 
-For MA SNAP at ~25 fields populated this is ~375 calls — comparable to today's pilot run cost.
+For MA SNAP at ~25 fields populated this is ~125 calls — roughly one third the cost of the V1 three-model pilot run.
 
 **Reasoning.**
+
 - Self-consistency catches LLM-generated noise (the same model giving different answers on different runs).
-- Cross-model agreement catches model-specific knowledge gaps (one model doesn't know MA's RAO email even after retrieval).
-- The two signals are orthogonal; using both is the cheapest way to identify hard cells.
+- Five runs is the same per-model run count we used in the original three-model pilot, so its statistical properties (e.g., the maj@5 vs pass@5 oracle gap of about 0% for Opus reported in `[README.md` line 59](../README.md)`) carry over directly. Holding the per-model run count constant while dropping the model count keeps self-consistency strong.
+- Multi-model cross-checking is deferred — see "Future work" in §7.3.
 
 ### 7.5 Step 3e — Tiered certification gate
 
 **Plan.** Each cell of the Phase 3 output table gets one of three labels:
 
-| Tier | Rule | Fate |
-|---|---|---|
-| **Auto-certify** | cross-model majority agrees AND best-model self-consistency ≥ 0.6 AND ≥1 source in allowed domains | Written to playbook with `confidence: "high"`, `needs_manual_review: false`. |
-| **Soft-certify** | exactly one of those signals fails | Written to playbook with `confidence: "medium"`, `needs_manual_review: false`, but flagged in a separate audit log. |
-| **Manual queue** | ≥ 2 signals fail | Written to playbook with `value: null`, `needs_manual_review: true`. Human fills in. |
+
+| Tier             | Rule                                                                | Fate                                                                                                                |
+| ---------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Auto-certify** | self-consistency ≥ 0.6 AND ≥1 source in allowed domains             | Written to playbook with `confidence: "high"`, `needs_manual_review: false`.                                        |
+| **Soft-certify** | exactly one of those signals fails                                  | Written to playbook with `confidence: "medium"`, `needs_manual_review: false`, but flagged in a separate audit log. |
+| **Manual queue** | both signals fail                                                   | Written to playbook with `value: null`, `needs_manual_review: true`. Human fills in.                                |
+
 
 **Per-field overrides** (set in `question_spec.yaml`):
+
 - `certification_threshold: high` (mission-critical fields like `state_law.public_records_law.citation`, `agency_program.administering_agency.name`) — auto-certify only.
 - `certification_threshold: medium` (most fields) — auto-certify or soft-certify acceptable.
 - `certification_threshold: low` (tolerant fields like alias lists, keyword lists) — even one-signal-passing accepted.
 
 **Reasoning.**
-- The proposal A1.3 specifies "100% agreement across LLMs and with the benchmark test set." Per the README's preliminary results ([`README.md` lines 49-53](../README.md)), no model is at 100%; Opus is at 76%. A literal reading of A1.3 would certify almost nothing. V1's "Opt2" already proposed softening this; V2 makes the softening explicit and tiered.
-- The three signals (cross-model, self-consistency, source domain) are orthogonal and each catches a different failure mode.
+
+- The proposal A1.3 specifies "100% agreement across LLMs and with the benchmark test set." Per the README's preliminary results (`[README.md` lines 49-53](../README.md)), Opus is at 76% accuracy; the weaker two families used in the original pilot are well below that. A literal reading of A1.3 would certify almost nothing on any single model. V1's "Opt2" already proposed softening this; V2 makes the softening explicit and tiered, using self-consistency and source-domain matching as the two orthogonal signals on the single Opus run.
+- Dropping cross-model from the rule means the tiered gate now has two signals instead of three. The price is that a single-model wrong-but-consistent failure (Opus produces the same wrong answer 5 times, citing a `.gov` URL) will auto-certify. Phase 5 catches this downstream by comparing the drafted letter to the gold letter and the DTA precedent; the Phase 2 benchmark also catches it directly because ground-truth values are hand-verified.
 - Per-field thresholds prevent a single global threshold from being too lax for high-stakes fields or too strict for tolerant ones.
 
 **Phase 3 design-principles check.**
+
 - Bounded LLM tasks? Yes — one typed value per call.
 - Retrieval grounding? Yes — web-tool-enabled models for V2.
 - Auditability? Yes — every web-extracted cell has source URL, quote, confidence, and certification tier; production-only cells retain their Phase 1b local-document evidence.
 
 **Deliverables.**
+
 - `pipeline/prompts/extraction_short_answer.txt` — the full prompt.
 - A fork of `run_experiment.py` (call it `run_extraction.py`) wired to the new prompt + `question_spec.yaml`.
 - Output CSVs in the existing `exp_results/` shape so today's analysis tiers continue to work.
@@ -863,7 +892,7 @@ For MA SNAP at ~25 fields populated this is ~375 calls — comparable to today's
 
 ### 8.1 Step 4a — Drafting prompt redesign
 
-**Plan.** Replace the current V1 skeleton [`pipeline/drafting_prompt.text`](drafting_prompt.text) with a structured prompt at `pipeline/prompts/drafting_prompt.txt`.
+**Plan.** Write a new structured prompt at `pipeline/prompts/drafting_prompt.txt`. (The V1 placeholder `pipeline/drafting_prompt.text` was deleted as part of the Phase 1 wrap-up; it was never migrated forward because the Phase 4 prompt is a fresh design.)
 
 **System prompt:**
 
@@ -916,6 +945,7 @@ Compose the letter now.
 ```
 
 **Reasoning.**
+
 - Forbidding placeholder phrases like "the agency" is the cheapest way to detect a missing slot — Phase 5a checks for them.
 - The `<validation>` JSON block makes Phase 5a deterministic: instead of pattern-matching the letter, we parse the validation block and check each declared slot location exists.
 - The primary few-shot comes from the DTA production package because it is a known-successful MA benefits-tech request; MuckRock examples gathered in Phase 1c Layer D are secondary tone and structure comparators.
@@ -930,14 +960,16 @@ Compose the letter now.
 4. Calls the drafting LLM (single model: Claude Opus 4.7 or equivalent).
 5. Parses the `<letter>` and `<validation>` tags.
 6. Writes:
-   - `pipeline/generated_requests/MA_SNAP.txt` — the letter.
-   - `pipeline/generated_requests/MA_SNAP.snapshot.json` — `{playbook, selected_modules, prompt_hash, model, timestamp, validation_block}` so the draft is fully reproducible.
+  - `pipeline/generated_requests/MA_SNAP.txt` — the letter.
+  - `pipeline/generated_requests/MA_SNAP.snapshot.json` — `{playbook, selected_modules, prompt_hash, model, timestamp, validation_block}` so the draft is fully reproducible.
 
 **Reasoning.**
+
 - The snapshot is the auditability hook. Six months later we can re-render the same letter from the same inputs and confirm the LLM is deterministic-enough; or we can re-run with updated playbook data and diff the letters.
-- Single model (not multi-model + majority) at this stage because composition is not the failure mode — the playbook data is. Phase 3 already did the multi-model work.
+- Single model at this stage because composition is not the failure mode — the playbook data is. Phase 3 has already validated the playbook values via single-model self-consistency and source-domain matching (per §7.4 and §7.5); the drafting step inherits that validated input.
 
 **Phase 4 design-principles check.**
+
 - Bounded LLM tasks? Yes — composition only, no fact invention.
 - Auditability? Yes — full snapshot per draft.
 
@@ -951,30 +983,34 @@ Compose the letter now.
 
 **Plan.** A pure-Python script `pipeline/validation/layer1a_checklist.py` that takes `(letter, snapshot)` and runs:
 
-| Check | Implementation |
-|---|---|
-| Statute citation present once | `state_law.public_records_law.citation` substring count == 1 in letter. |
-| Recipient address block matches | Joined `agency_program.contact.address_*` fields all appear in the letter. |
-| RAO name and title appear | If `agency_program.records_officer.{name,title}` is non-null, both must appear. |
-| Time scope is concretely dated | Regex for `\b(January\|February\|...\|December)\s+\d{1,2},\s+\d{4}\b` finds at least one date. |
-| Delivery format named | At least one of {electronic, PDF, email, mail} present. |
-| Fee-waiver paragraph iff `fee_waiver.available` | Mutual implication; substring check on `fee_waiver.statutory_citation`. |
-| Certification clause iff state requires | Substring match on `certification_text`. |
-| ADS scope terminology present | At least one term from each group appears: automated decision systems / algorithms / data-matching; eligibility / fraud / case review; SNAP. |
-| Production-proven record classes present | The letter asks for procurement records, system documentation, staff-use materials, and validation or accuracy records. |
-| Benefits-tech expansion modules present | If selected, implementation deliverables, data inputs/dictionaries, risk alerts/dashboards, and vendor support/change-request modules appear as distinct request items. |
-| No forbidden placeholder phrases | Regex for `\b(the agency\|the relevant statute\|the appropriate office)\b` returns 0 matches. |
-| Validation block round-trip | Each slot listed in `<validation>` is found at the declared location. |
+
+| Check                                           | Implementation                                                                                                                                                          |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Statute citation present once                   | `state_law.public_records_law.citation` substring count == 1 in letter.                                                                                                 |
+| Recipient address block matches                 | Joined `agency_program.contact.address_`* fields all appear in the letter.                                                                                              |
+| RAO name and title appear                       | If `agency_program.records_officer.{name,title}` is non-null, both must appear.                                                                                         |
+| Time scope is concretely dated                  | Regex for `\b(January|February|...|December)\s+\d{1,2},\s+\d{4}\b` finds at least one date.                                                                             |
+| Delivery format named                           | At least one of {electronic, PDF, email, mail} present.                                                                                                                 |
+| Fee-waiver paragraph iff `fee_waiver.available` | Mutual implication; substring check on `fee_waiver.statutory_citation`.                                                                                                 |
+| Certification clause iff state requires         | Substring match on `certification_text`.                                                                                                                                |
+| ADS scope terminology present                   | At least one term from each group appears: automated decision systems / algorithms / data-matching; eligibility / fraud / case review; SNAP.                            |
+| Production-proven record classes present        | The letter asks for procurement records, system documentation, staff-use materials, and validation or accuracy records.                                                 |
+| Benefits-tech expansion modules present         | If selected, implementation deliverables, data inputs/dictionaries, risk alerts/dashboards, and vendor support/change-request modules appear as distinct request items. |
+| No forbidden placeholder phrases                | Regex for `\b(the agency|the relevant statute|the appropriate office)\b` returns 0 matches.                                                                             |
+| Validation block round-trip                     | Each slot listed in `<validation>` is found at the declared location.                                                                                                   |
+
 
 Failure mode: any failed check returns the draft to Phase 4 with a structured error list. No LLM cost for re-drafting until human inspection if the same check fails twice.
 
 **Reasoning.**
+
 - Most defects in LLM-generated letters are of the "forgot to put in slot X" variety — that's deterministic and cheap to catch.
 - Returning structured errors (rather than free-text feedback) means Phase 4 can re-prompt the LLM with "Fix these 3 specific issues" rather than "Try again."
 
 ### 9.2 Step 5b — Layer 1b: LLM-as-judge against DTA precedent + MuckRock precedents
 
 **Plan.** Only invoked if Layer 1a passes. The judge LLM gets:
+
 - The candidate draft.
 - The DTA production-derived request excerpt and production inventory from `pipeline/precedents/MA_DTA_ADS_2026/`.
 - 3 hand-picked successful MuckRock SNAP/benefits requests from `pipeline/validation/muckrock_examples/` as secondary comparators.
@@ -1007,6 +1043,7 @@ Return JSON only:
 ```
 
 **Reasoning.**
+
 - 1a catches structural omissions. 1b catches the things humans actually notice: the request is too vague, the tone is wrong, or a section that a successful requester included is missing.
 - Comparing against the DTA production package prevents the judge from rewarding polished but underpowered requests that omit the scope elements already proven to produce records.
 - JSON-only output makes the gate machine-readable for Phase 6 promotion-gate dashboards.
@@ -1014,6 +1051,7 @@ Return JSON only:
 ### 9.3 Step 5c — Layer 2: human review
 
 **Plan.** A human (RA) compares the draft against `pipeline/gold_letters/MA_SNAP.md` from Phase 1a:
+
 - Compute character-level edit distance.
 - Section-level diff.
 - Record acceptance status: `accepted_as_is | accepted_with_minor_edits | major_rewrite_required | rejected`.
@@ -1021,10 +1059,12 @@ Return JSON only:
 **Pilot acceptance criterion:** ≤ 20% character edits to convert LLM draft into the human-approved final.
 
 **Reasoning.**
+
 - The gold request is the *operational* quality target — the letter we'd actually want to send. Edit-distance to the gold is the most direct metric we have.
 - Categorical acceptance status feeds promotion-gate dashboards.
 
 **Phase 5 design-principles check.**
+
 - Programmatic-before-semantic? Yes — Layer 1a gates Layer 1b which gates Layer 2.
 - Auditability? Yes — every review produces a structured record.
 
@@ -1036,14 +1076,17 @@ Return JSON only:
 
 V2 itself stops at MA SNAP. Promotion to broader scope is gated by quantitative criteria.
 
-| Gate | Scope | Pass criterion |
-|---|---|---|
-| **Pilot v1** (this doc) | MA × SNAP, single cell | (a) 100% of words in the gold request trace to a slot, module, or boilerplate; (b) ≥ 80% of web-extractable fields auto-certified in Phase 3; (c) Phase 5 Layer 2 acceptance is "accepted with minor edits" or better. |
-| **Pilot v2** | MA × {SNAP, Medicaid, WIC, LIHEAP, TANF, CHIP} | (a) ≥ 80% of LLM drafts accepted with ≤ 20% character edits; (b) Layer 1a passes ≥ 95% of drafts on first try. |
-| **Pilot v3** | 5 states × 2 programs (= original proposal A2.3 pilot scope) | Real-submission response rate ≥ 60% within statutory window; tracking for acknowledgements, fee estimates/waivers, clarifications, productions, denials, appeals. |
-| **Scale** | 50 states × 6 programs | Meets v3 criterion as the steady-state rate. |
+
+| Gate                    | Scope                                                        | Pass criterion                                                                                                                                                                                                         |
+| ----------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pilot v1** (this doc) | MA × SNAP, single cell                                       | (a) 100% of words in the gold request trace to a slot, module, or boilerplate; (b) ≥ 80% of web-extractable fields auto-certified in Phase 3; (c) Phase 5 Layer 2 acceptance is "accepted with minor edits" or better. |
+| **Pilot v2**            | MA × {SNAP, Medicaid, WIC, LIHEAP, TANF, CHIP}               | (a) ≥ 80% of LLM drafts accepted with ≤ 20% character edits; (b) Layer 1a passes ≥ 95% of drafts on first try.                                                                                                         |
+| **Pilot v3**            | 5 states × 2 programs (= original proposal A2.3 pilot scope) | Real-submission response rate ≥ 60% within statutory window; tracking for acknowledgements, fee estimates/waivers, clarifications, productions, denials, appeals.                                                      |
+| **Scale**               | 50 states × 6 programs                                       | Meets v3 criterion as the steady-state rate.                                                                                                                                                                           |
+
 
 **Reasoning.** Each gate adds **one** axis of variation, so when something breaks we know which dimension caused it:
+
 - v1 → v2 adds programs (within MA) — exposes whether modules are truly program-agnostic.
 - v2 → v3 adds states — exposes whether `state_law` and `agency_program` schemas generalize.
 - v3 → scale adds real-world response feedback — exposes whether the letters actually work.
@@ -1052,17 +1095,19 @@ V2 itself stops at MA SNAP. Promotion to broader scope is gated by quantitative 
 
 ## 11. Open risks and mitigations
 
-| Risk | Likelihood | Mitigation |
-|---|---|---|
-| Some states / agencies require submission via a portal (NextRequest, JustFOIA, custom forms), not free-text email | High at scale | `agency_program.portal.required_fields` field reserved in V2; portal-driven submission gets a separate v3 sub-workflow that maps slots → form fields. |
-| Residency-restricted states (historically AR, TN, VA at various times) refuse non-resident requests | Low for SNAP-administering agencies, but real | `state_law.residency_restriction` boolean flagged; partner with in-state organizations per proposal §2.4. |
-| State agencies route SNAP to county offices (notably CA, NY) | Medium | `agency_program.sub_agency` captures this; module `recipient_block` handles county-level recipient lines. |
-| Government webpages change, breaking source URLs | Medium | `evidence[].retrieved_at` lets us detect stale web evidence; periodic re-extraction. |
-| Production-document facts cannot be independently re-fetched from the web | Medium | `source_type`, `source_ref`, `received_at`, `page`, and `production_package_id` preserve provenance; manual refresh happens only when a new production is received. |
-| MuckRock precedents become outdated relative to current law | Low (slow drift) | Periodically refresh `muckrock_examples/`; date-tag each example. The DTA production precedent remains primary for MA SNAP request scope unless superseded by a newer successful production. |
-| LLM hallucinates source URLs that 404 | Medium | Source URL pattern check in `question_spec.yaml`; future: add HTTP-status check before accepting a citation. |
-| Cost of multi-model × 5-runs at scale | Medium for 50-state | Per-field certification thresholds reduce the multi-model burden on tolerant fields; web-tool-enabled models will cost more per call but reduce need for re-runs. |
-| Schema drift between V2 and V3 (when retrieval is added) | Low | V2 schemas already accommodate web retrieval and production-document provenance (the `evidence[]` shape doesn't change). |
+
+| Risk                                                                                                              | Likelihood                                    | Mitigation                                                                                                                                                                                   |
+| ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Some states / agencies require submission via a portal (NextRequest, JustFOIA, custom forms), not free-text email | High at scale                                 | `agency_program.portal.required_fields` field reserved in V2; portal-driven submission gets a separate v3 sub-workflow that maps slots → form fields.                                        |
+| Residency-restricted states (historically AR, TN, VA at various times) refuse non-resident requests               | Low for SNAP-administering agencies, but real | `state_law.residency_restriction` boolean flagged; partner with in-state organizations per proposal §2.4.                                                                                    |
+| State agencies route SNAP to county offices (notably CA, NY)                                                      | Medium                                        | `agency_program.sub_agency` captures this; module `recipient_block` handles county-level recipient lines.                                                                                    |
+| Government webpages change, breaking source URLs                                                                  | Medium                                        | `evidence[].retrieved_at` lets us detect stale web evidence; periodic re-extraction.                                                                                                         |
+| Production-document facts cannot be independently re-fetched from the web                                         | Medium                                        | `source_type`, `source_ref`, `received_at`, `page`, and `production_package_id` preserve provenance; manual refresh happens only when a new production is received.                          |
+| MuckRock precedents become outdated relative to current law                                                       | Low (slow drift)                              | Periodically refresh `muckrock_examples/`; date-tag each example. The DTA production precedent remains primary for MA SNAP request scope unless superseded by a newer successful production. |
+| LLM hallucinates source URLs that 404                                                                             | Medium                                        | Source URL pattern check in `question_spec.yaml`; future: add HTTP-status check before accepting a citation.                                                                                 |
+| Cost of single-model × 5-runs at scale                                                                            | Low for MA SNAP pilot; medium for 50-state    | V2 pilot is ~125 calls (1 model × 5 runs × ~25 fields), already roughly one third the V1 three-model cost. Per-field certification thresholds further reduce calls on tolerant fields; web-tool-enabled Opus costs more per call but reduces need for re-runs. If 50-state scaling exhausts the budget, the V3 retriever-plus-cheaper-model path described in §7.3 is the cost lever. |
+| Schema drift between V2 and V3 (when retrieval is added)                                                          | Low                                           | V2 schemas already accommodate web retrieval and production-document provenance (the `evidence[]` shape doesn't change).                                                                     |
+
 
 ---
 
@@ -1071,9 +1116,9 @@ V2 itself stops at MA SNAP. Promotion to broader scope is gated by quantitative 
 Current repository hygiene status, in priority order:
 
 1. **Done: rename `pipline/` -> `pipeline/`.** The canonical workflow-design tree is now `pipeline/`, and root documentation links should use that path.
-2. **Still pending: move prompts under `pipeline/prompts/`** with consistent names: `extraction_short_answer.txt`, `drafting_prompt.txt`, `judge_prompt.txt`. This will replace today's [`pipeline/drafting_prompt.text`](drafting_prompt.text) and the empty [`pipeline/questions_prompt.txt`](questions_prompt.txt).
-3. **Still pending: promote `request_playbook.json` to a derived rendering.** The schemas and per-row playbook files are canonical; today's empty placeholders [`pipeline/request_playbook.json`](request_playbook.json) and [`pipeline/request_playbook.csv`](request_playbook.csv) should be deleted once the V2 schemas exist and any exports can be regenerated from them.
-4. **Long-term: move benchmark from `data/` to `pipeline/benchmarks/`.** V2 doesn't require this immediately to avoid breaking today's runners ([`exp_results/run_experiment.py`](../exp_results/run_experiment.py), [`exp_results/score_experiments.py`](../exp_results/score_experiments.py)), but the canonical home for question-set artifacts is the pipeline tree.
+2. **Done: V1 prompt placeholders removed.** The legacy files `pipeline/drafting_prompt.text` and `pipeline/questions_prompt.txt` have been deleted as part of the Phase 1 wrap-up. The Phase 3 / Phase 4 / Phase 5 prompts will land at `pipeline/prompts/{extraction_short_answer,drafting_prompt,judge_prompt}.txt` when those phases are implemented.
+3. **Done: V1 playbook placeholders removed.** The empty `pipeline/request_playbook.json` and `pipeline/request_playbook.csv` files have been deleted now that the canonical schemas in `pipeline/schemas/` and the per-row playbook files in `pipeline/playbook/` exist. If a flattened export is needed downstream, it can be regenerated from those canonical files.
+4. **Long-term: move benchmark from `data/` to `pipeline/benchmarks/`.** V2 doesn't require this immediately to avoid breaking today's runners (`[exp_results/run_experiment.py](../exp_results/run_experiment.py)`, `[exp_results/score_experiments.py](../exp_results/score_experiments.py)`), but the canonical home for question-set artifacts is the pipeline tree.
 
 ---
 
@@ -1141,6 +1186,7 @@ V2 deliberately does **not** cover:
 - **Federal FOIA requests** — V2 focuses on state public-records laws.
 - **Cost projections / token-budget modeling** — separate exercise after pilot v1 produces real numbers.
 - **Multi-state, multi-program data** — promotion to that scope is gated per §10.
+- **Multi-model cross-checking in Phase 3** — V2 uses a single web-tool-enabled model (Claude Opus 4.7) per §7.3 and §7.4; multi-model agreement is deferred to V3 / future work and is conditional on either lower-cost frontier models becoming Opus-competitive or a specific field class where Opus disagrees with itself across runs.
 
 ---
 
